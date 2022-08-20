@@ -6,7 +6,7 @@
 - [数据库 DDL](../.github/tree/main/profile/成立初期/sql)
 - 压测报告
 
-## 目录机构
+## 目录结构
 
 待更新...
 
