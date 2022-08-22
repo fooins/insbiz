@@ -175,6 +175,7 @@ Signature = Base64( HMAC_SHA1( SecretKey, SecretId + Timestamp + Path + Query + 
 - Path：请求路径。
 - Query：对所有 HTTP Query 参数按参数名的字典序（ASCII 码）升序排序，然后使用 “=” 连接参数名和参数值，再使用 “&” 连接每个键值对得到 Query 串。若没有 HTTP Query 参数则使用空字符串。
 - Body：最终用于发送到服务端的数据体，JSON 字符串格式。若没有则使用空字符串。
+- +：这里的加号表示字符串连接。
 
 以下是示例：
 
