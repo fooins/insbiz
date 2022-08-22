@@ -79,7 +79,7 @@
 | 属性名       |    类型    | 必需 | 描述                   |
 | ------------ | :--------: | :--: | ---------------------- |
 | `code`       |   字符串   |  是  | 更具体的错误代码。     |
-| `innererror` | InnerError |  否  | 嵌套的 InnerError 对象 |
+| `innerError` | InnerError |  否  | 嵌套的 InnerError 对象 |
 
 ### 1.3.3. 错误对象示例
 
@@ -91,15 +91,15 @@
     "code": "BadArgument",
     "message": "Previous passwords may not be reused",
     "target": "password",
-    "innererror": {
+    "innerError": {
       "code": "PasswordError",
-      "innererror": {
+      "innerError": {
         "code": "PasswordDoesNotMeetPolicy",
         "minLength": "6",
         "maxLength": "64",
         "characterTypes": ["lowerCase", "upperCase", "number", "symbol"],
         "minDistinctCharacterTypes": "2",
-        "innererror": {
+        "innerError": {
           "code": "PasswordReuseNotAllowed"
         }
       }
