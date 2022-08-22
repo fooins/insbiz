@@ -185,7 +185,7 @@ SecretId = "a867f464-55ea-4004-af53-0c8b025e7dc2"
 SecretKey = "uKB^9C$@o6rbEDQKHHk01388lG@odVxJ"
 Timestamp = "1659917288"
 Path = "/v1.0/entities"
-Query = "?size=10&offset=0"
+Query = "size=10&offset=0"
 Body = ""
 
 // 计算出的签名串为：
