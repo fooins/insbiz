@@ -187,7 +187,7 @@ Signature = Base64( HMAC_SHA1( SecretKey, SecretId + Timestamp + Path + Query + 
 - Body：最终用于发送到服务端的数据体，JSON 字符串格式。若没有则使用空字符串。
 - +：这里的加号表示字符串连接。
 
-以下是示例：
+<details><summary>点击查看示例</summary>
 
 ```
 // 假设：
@@ -201,6 +201,8 @@ Body = ""
 // 计算出的签名串为：
 Signature = ""
 ```
+
+</details>
 
 ## 1.5. 其他细节
 
