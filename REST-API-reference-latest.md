@@ -100,7 +100,7 @@
 | `code`       |            字符串            |  是  | 更具体的错误代码。     |
 | `innerError` | [内部错误对象](#inner-error) |  否  | 嵌套的 InnerError 对象 |
 
-<details><summary>包含 innerError 的示例：</summary>
+<details><summary>包含 innerError 的示例</summary>
 
 ```json
 {
@@ -127,7 +127,7 @@
 
 </details>
 
-<details><summary>包含 details 的示例：</summary>
+<details><summary>包含 details 的示例</summary>
 
 ```json
 {
@@ -271,7 +271,7 @@ Signature = ""
 |  8  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。         |
 |  9  | `premium`      | 浮点值                             | [?](#required) | 保费。精确到两位小数。 |
 
-完整示例：
+<details><summary>完整示例</summary>
 
 ```JSON
 {
@@ -308,6 +308,8 @@ Signature = ""
   ]
 }
 ```
+
+</details>
 
 ### 2.1.2. 响应数据
 
@@ -357,7 +359,7 @@ Signature = ""
 |  9  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。         |
 | 10  | `premium`      | 浮点值                             | [?](#required) | 保费。精确到两位小数。 |
 
-完整示例：
+<details><summary>完整示例</summary>
 
 ```JSON
 {
@@ -401,6 +403,8 @@ Signature = ""
 }
 ```
 
+</details>
+
 ## 2.2. 报价
 
 请求方法：POST
@@ -437,7 +441,7 @@ Signature = ""
 |  8  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。         |
 |  9  | `premium`      | 浮点值                             |       是       | 保费。精确到两位小数。 |
 
-响应数据完整示例：
+<details><summary>响应数据完整示例</summary>
 
 ```JSON
 {
@@ -464,6 +468,8 @@ Signature = ""
   ]
 }
 ```
+
+</details>
 
 ## 2.3. 查询保单
 
@@ -591,7 +597,7 @@ Signature = ""
 |  8  | `contactNo`    | 字符串                             |  否  | 联系号码。     |
 |  9  | `email`        | 字符串                             |  否  | 电子邮箱地址。 |
 
-完整示例：
+<details><summary>完整示例</summary>
 
 ```JSON
 {
@@ -627,6 +633,8 @@ Signature = ""
 }
 ```
 
+</details>
+
 ### 3.1.2. 响应数据
 
 响应数据：
@@ -648,7 +656,7 @@ Signature = ""
 |  4  | `current`  | 字符串                     |  是  | 当前值（批改后）。                   |
 |  5  | `targetNo` | 字符串                     |  否  | 批改目标编号。投保人或被保险人编号。 |
 
-完整示例：
+<details><summary>完整示例</summary>
 
 ```JSON
 {
@@ -666,6 +674,8 @@ Signature = ""
   ]
 }
 ```
+
+</details>
 
 # 4. 理赔接口
 
@@ -697,7 +707,7 @@ Signature = ""
 |  7  | `contactNo`    | 字符串                             | [?](#required) | 联系号码。     |
 |  8  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。 |
 
-完整示例：
+<details><summary>完整示例</summary>
 
 ```JSON
 {
@@ -716,6 +726,8 @@ Signature = ""
   ]
 }
 ```
+
+</details>
 
 ### 4.1.2. 响应数据
 
@@ -743,7 +755,7 @@ Signature = ""
 |  9  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。         |
 | 10  | `premium`      | 浮点值                             | [?](#required) | 保费。精确到两位小数。 |
 
-完整示例：
+<details><summary>完整示例</summary>
 
 ```JSON
 {
@@ -766,6 +778,8 @@ Signature = ""
   ]
 }
 ```
+
+</details>
 
 ## 4.2. 查询理赔单
 
@@ -813,6 +827,21 @@ Signature = ""
 |  1  | `claimNo`  | 字符串                     |  是  | 理赔单号。   |
 |  2  | `policyNo` | 字符串                     |  是  | 保单号。     |
 |  3  | `status`   | [理赔状态](#理赔状态枚举-) |  是  | 理赔单状态。 |
+
+<details><summary>消息类型为 “理赔状态变更” 的消息内容示例</summary>
+
+```JSON
+{
+  "type": "ClaimStatusChange",
+  "content": {
+    "claimNo": "C00000000001",
+    "policyNo": "P000000000000001",
+    "status": "confirmed"
+  }
+}
+```
+
+</details>
 
 ### 5.1.2. 客户端响应
 
