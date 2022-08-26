@@ -175,18 +175,6 @@ Authorization: SecretId={密钥标识}, Timestamp={签名时间}, Signature={签
 Signature = Base64( HMAC_SHA1( SecretKey, SecretId + Timestamp + Path + Query + Body ) )
 ```
 
-其中：
-
-- Base64：一种二进制数据编码方式，参阅 [RFC 4648](https://www.rfc-editor.org/rfc/rfc4648) 标准文件。
-- HMAC_SHA1：一种加密算法，参阅 [RFC 2104](https://www.rfc-editor.org/rfc/rfc2104) 标准文件。
-- SecretKey：由管理员分配的密钥，请妥善保管避免泄漏。
-- SecretId：由管理员分配的密钥标识。
-- Timestamp：发起请求之时的秒级时间戳。
-- Path：请求路径。
-- Query：对所有 HTTP Query 参数按参数名的字典序（ASCII 码）升序排序，然后使用 “=” 连接参数名和参数值，再使用 “&” 连接每个键值对得到 Query 串。若没有 HTTP Query 参数则使用空字符串。
-- Body：最终用于发送到服务端的数据体，JSON 字符串格式。若没有则使用空字符串。
-- +：这里的加号表示字符串连接。
-
 <details><summary>点击查看示例</summary>
 
 ```
@@ -203,6 +191,18 @@ Signature = ""
 ```
 
 </details>
+
+其中：
+
+- Base64：一种二进制数据编码方式，参阅 [RFC 4648](https://www.rfc-editor.org/rfc/rfc4648) 标准文件。
+- HMAC_SHA1：一种加密算法，参阅 [RFC 2104](https://www.rfc-editor.org/rfc/rfc2104) 标准文件。
+- SecretKey：由管理员分配的密钥，请妥善保管避免泄漏。
+- SecretId：由管理员分配的密钥标识。
+- Timestamp：发起请求之时的秒级时间戳。
+- Path：请求路径。
+- Query：对所有 HTTP Query 参数按参数名的字典序（ASCII 码）升序排序，然后使用 “=” 连接参数名和参数值，再使用 “&” 连接每个键值对得到 Query 串。若没有 HTTP Query 参数则使用空字符串。
+- Body：最终用于发送到服务端的数据体，JSON 字符串格式。若没有则使用空字符串。
+- +：这里的加号表示字符串连接。
 
 ## 1.5. 其他细节
 
