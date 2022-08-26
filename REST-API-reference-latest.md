@@ -100,7 +100,7 @@
 | `code`       |            字符串            |  是  | 更具体的错误代码。     |
 | `innerError` | [内部错误对象](#inner-error) |  否  | 嵌套的 InnerError 对象 |
 
-包含 innerError 的示例：
+<details><summary>包含 innerError 的示例：</summary>
 
 ```json
 {
@@ -125,7 +125,9 @@
 }
 ```
 
-包含 details 的示例：
+</details>
+
+<details><summary>包含 details 的示例：</summary>
 
 ```json
 {
@@ -153,6 +155,8 @@
   }
 }
 ```
+
+</details>
 
 ### 1.3.3. 错误代码
 
