@@ -6,5 +6,5 @@ const hostname = process.env.HOST || "127.0.0.1";
 
 // 创建 HTTP 服务并监听端口
 app.listen(port, hostname, () => {
-  console.info(`HTTP 服务启动成功 ${host}:${port}`);
+  console.info(`HTTP 服务启动成功 ${hostname}:${port}`);
 });
