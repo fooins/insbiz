@@ -1,5 +1,5 @@
-const Koa = require("koa");
-const router = require("./router");
+const Koa = require('koa');
+const router = require('./router');
 
 // 实例化一个 Koa 应用
 const app = new Koa();

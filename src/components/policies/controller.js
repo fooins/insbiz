@@ -1,5 +1,5 @@
 class PolicyController {
-  async bound(ctx) {
+  static async bound(ctx) {
     ctx.status = 200;
     ctx.body = {
       policyNo: `P${Date.now()}`,
@@ -7,4 +7,4 @@ class PolicyController {
   }
 }
 
-module.exports = new PolicyController();
+module.exports = PolicyController;
