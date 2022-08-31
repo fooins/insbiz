@@ -1,6 +1,6 @@
-const controller = require("./controller");
-const dao = require("./dao");
-const service = require("./service");
+const controller = require('./controller');
+const dao = require('./dao');
+const service = require('./service');
 
 module.exports = {
   policyController: controller,
