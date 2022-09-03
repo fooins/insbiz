@@ -12,17 +12,30 @@ let httpServerRef = null;
 class AppError extends Error {
   /**
    * 错误对象构造函数。
-   * @param {string} name 错误名称
+   *
+   * addition
+   *  - code<string>：错误代码
+   *  - HTTPStatus<number>：HTTP 状态代码
+   *  - isTrusted<boolean>：是否可信的错误，不可信的错误通常会触发服务和进程关闭
+   *  - cause<unknown>：错误根因
+   *
    * @param {string} message 错误消息
-   * @param {number} HTTPStatus HTTP 状态代码
-   * @param {boolean} isTrusted 是否可信的错误。不可信的错误通常会触发服务和进程关闭。
+   * @param {object} addition 附加信息
    */
-  constructor(name, message, HTTPStatus = 500, isTrusted = true) {
+  constructor(message, addition = {}) {
     super(message);
 
-    this.name = name;
+    const {
+      code = 'GeneralException',
+      HTTPStatus = 500,
+      isTrusted = true,
+      cause,
+    } = addition;
+
+    this.code = code;
     this.HTTPStatus = HTTPStatus;
     this.isTrusted = isTrusted;
+    if (cause) this.cause = cause;
   }
 }
 
@@ -37,7 +50,9 @@ const normalizeError = (errorToHandle) => {
   }
 
   if (errorToHandle instanceof Error) {
-    const appError = new AppError(errorToHandle.name, errorToHandle.message);
+    const appError = new AppError(errorToHandle.message, {
+      cause: errorToHandle,
+    });
     appError.stack = errorToHandle.stack;
     return appError;
   }
@@ -45,8 +60,10 @@ const normalizeError = (errorToHandle) => {
   const type = typeof errorToHandle;
   const value = util.inspect(errorToHandle);
   return new AppError(
-    'general-error',
-    `错误处理程序收到一个非错误类型的实例：${type} ${value}`,
+    `错误处理程序收到一个未知的错误类型实例：${type} ${value}`,
+    {
+      cause: errorToHandle,
+    },
   );
 };
 
@@ -69,7 +86,7 @@ const handleError = (errorToHandle) => {
     const appError = normalizeError(errorToHandle);
 
     // 记录日志
-    logger.error(appError.message, { ...appError });
+    logger.error(appError, { ...appError });
 
     // 不可信的错误触发服务和进程关闭
     if (!appError.isTrusted) {
