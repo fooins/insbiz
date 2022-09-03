@@ -92,6 +92,8 @@ const handleError = (errorToHandle) => {
     if (!appError.isTrusted) {
       terminateHttpServerAndExit();
     }
+
+    return appError;
   } catch (handlingError) {
     // 这里没有记录日志，因为它可能已经失败了
     process.stdout.write(
@@ -99,6 +101,8 @@ const handleError = (errorToHandle) => {
     );
     process.stdout.write(JSON.stringify(handlingError));
     process.stdout.write(JSON.stringify(errorToHandle));
+
+    return null;
   }
 };
 
@@ -128,8 +132,23 @@ const listenToErrorEvents = (httpServer) => {
   });
 };
 
+/**
+ * 处理路由错误的中间件
+ * @param {object} ctx 请求的上下文
+ * @param {*} next 一个用于执行下游中间件的函数
+ */
+const handleRouteErrors = async (ctx, next) => {
+  try {
+    await next();
+  } catch (error) {
+    const appError = handleError(error);
+    ctx.status = appError ? appError.HTTPStatus : 500;
+  }
+};
+
 module.exports = {
   AppError,
   handleError,
   listenToErrorEvents,
+  handleRouteErrors,
 };
