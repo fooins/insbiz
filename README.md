@@ -9,11 +9,30 @@
 
 ## 目录结构
 
-待更新...
+```
+├─ src  // 源代码目录
+│  ├─ components  // 业务组件目录
+│  │  └─ xxx  // 某个业务组件目录
+│  │     ├─ api-routes.js  // HTTP 接口路由
+│  │     ├─ dao.js  // 数据访问对象
+│  │     └─ service.js  // 业务逻辑实现
+│  ├─ libraries  // 工具包目录
+│  │  ├─ error-handling.js  // 错误处理工具
+│  │  └─ logger.js  // 日志工具
+│  ├─ app.js  // 程序主应用实现
+│  ├─ router.js  // HTTP 路由实现
+│  ├─ server.js  // HTTP 服务实现
+│  └─ start.js  // 程序启动入口
+└─ REST-API-reference-latest.md  // REST API 参考文档
+```
 
 ## 使用说明
 
-待更新...
+1. 克隆代码 `git clone https://github.com/fooins/insbiz.git`
+
+2. 安装依赖 `npm install`
+
+3. 启动程序 `npm run start:dev`
 
 ## 环境变量
 

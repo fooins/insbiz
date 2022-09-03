@@ -2,9 +2,9 @@
   "name": "insbiz",
   "version": "1.0.0",
   "description": "这是一个在福保成立初期设计开发的保险业务系统，它为前端销售渠道提供保险业务的接入，包括但不限于承保、退保、批改、查询保单、理赔、续保等服务。纯 API 接入没有界面。",
-  "main": "src/server.js",
+  "main": "src/start.js",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon ./src/server.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon ./src/start.js",
     "lint": "eslint ./src --fix"
   },
   "pre-commit": [

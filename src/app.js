@@ -1,12 +1,19 @@
 const Koa = require('koa');
 const rTracer = require('cls-rtracer');
 const router = require('./router');
+const { handleRouteErrors } = require('./libraries/error-handling');
 
 // 实例化一个 Koa 应用
 const app = new Koa();
 
-// 生成跟踪标识
+// 处理错误（没有追踪标识）
+app.use(handleRouteErrors);
+
+// 生成追踪标识
 app.use(rTracer.koaMiddleware());
+
+// 处理错误（有追踪标识）
+app.use(handleRouteErrors);
 
 // 设置路由
 app.use(router.routes());
