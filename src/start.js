@@ -1,6 +1,10 @@
 const { startHttpServer } = require('./server');
 const logger = require('./libraries/logger')('start');
-const { handleError, AppError } = require('./libraries/error-handling');
+const {
+  handleError,
+  AppError,
+  ErrorCodes,
+} = require('./libraries/error-handling');
 
 Promise.all([startHttpServer()])
   .then((startResponses) => {
@@ -11,7 +15,7 @@ Promise.all([startHttpServer()])
   .catch((error) => {
     handleError(
       new AppError(error.message, {
-        code: 'InternalServerError',
+        code: ErrorCodes.InternalServerError,
         isTrusted: false,
         cause: error,
       }),

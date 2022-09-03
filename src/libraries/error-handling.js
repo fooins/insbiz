@@ -8,6 +8,19 @@ const { respFail } = require('./response');
 let httpServerRef = null;
 
 /**
+ * 错误代码枚举
+ */
+const ErrorCodes = {
+  Unauthorized: 'Unauthorized',
+  AccessDenied: 'AccessDenied',
+  InvalidRequest: 'InvalidRequest',
+  NotFound: 'NotFound',
+  InternalServerError: 'InternalServerError',
+  ServiceUnavailable: 'ServiceUnavailable',
+  GeneralException: 'GeneralException',
+};
+
+/**
  * 统一错误类
  */
 class AppError extends Error {
@@ -27,7 +40,7 @@ class AppError extends Error {
     super(message);
 
     const {
-      code = 'GeneralException',
+      code = ErrorCodes.GeneralException,
       HTTPStatus = 500,
       isTrusted = true,
       target,
@@ -149,7 +162,7 @@ const handleRouteErrors = async (ctx, next) => {
     await next();
   } catch (error) {
     const {
-      code = 'GeneralException',
+      code = ErrorCodes.GeneralException,
       message = 'general exception',
       HTTPStatus = 500,
       target,
@@ -168,6 +181,7 @@ const handleRouteErrors = async (ctx, next) => {
 
 module.exports = {
   AppError,
+  ErrorCodes,
   handleError,
   listenToErrorEvents,
   handleRouteErrors,
