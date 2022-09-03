@@ -1,5 +1,6 @@
 const util = require('util');
 const logger = require('./logger')('error-handling');
+const { respFail } = require('./response');
 
 /**
  * HTTP 服务引用
@@ -29,12 +30,18 @@ class AppError extends Error {
       code = 'GeneralException',
       HTTPStatus = 500,
       isTrusted = true,
+      target,
+      details,
+      innerError,
       cause,
     } = addition;
 
     this.code = code;
     this.HTTPStatus = HTTPStatus;
     this.isTrusted = isTrusted;
+    if (target) this.target = target;
+    if (details) this.details = details;
+    if (innerError) this.innerError = innerError;
     if (cause) this.cause = cause;
   }
 }
@@ -141,8 +148,21 @@ const handleRouteErrors = async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-    const appError = handleError(error);
-    ctx.status = appError ? appError.HTTPStatus : 500;
+    const {
+      code = 'GeneralException',
+      message = 'general exception',
+      HTTPStatus = 500,
+      target,
+      details,
+      innerError,
+    } = handleError(error) || {};
+
+    respFail(ctx, code, message, {
+      status: HTTPStatus,
+      target,
+      details,
+      innerError,
+    });
   }
 };
 
