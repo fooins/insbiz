@@ -155,7 +155,7 @@ const listenToErrorEvents = (httpServer) => {
 /**
  * 处理路由错误的中间件
  * @param {object} ctx 请求的上下文
- * @param {*} next 一个用于执行下游中间件的函数
+ * @param {function} next 一个用于执行下游中间件的函数
  */
 const handleRouteErrors = async (ctx, next) => {
   try {
