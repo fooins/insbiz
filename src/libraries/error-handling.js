@@ -110,7 +110,9 @@ const handleError = (errorToHandle) => {
 
     // 不可信的错误触发服务和进程关闭
     if (!appError.isTrusted) {
-      terminateHttpServerAndExit();
+      logger.on('finish', () => {
+        terminateHttpServerAndExit();
+      });
     }
 
     return appError;
