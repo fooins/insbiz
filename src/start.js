@@ -1,19 +1,26 @@
 const { startHttpServer } = require('./server');
 const logger = require('./libraries/logger')('start');
-const { handleError, AppError } = require('./libraries/error-handling');
+const { validateConfigs } = require('./libraries/configuration');
+const {
+  handleError,
+  AppError,
+  ErrorCodes,
+} = require('./libraries/error-handling');
 
-Promise.all([startHttpServer()])
-  .then((startResponses) => {
-    logger.info('程序启动成功', {
-      httpServer: startResponses[0],
-    });
-  })
-  .catch((error) => {
+(async () => {
+  try {
+    validateConfigs();
+    logger.info('所有配置校验通过');
+
+    const addressInfo = await startHttpServer();
+    logger.info('HTTP 服务启动成功', { addressInfo });
+  } catch (error) {
     handleError(
       new AppError(error.message, {
-        code: 'InternalServerError',
+        code: ErrorCodes.InternalServerError,
         isTrusted: false,
         cause: error,
       }),
     );
-  });
+  }
+})();

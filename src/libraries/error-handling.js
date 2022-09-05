@@ -1,10 +1,24 @@
 const util = require('util');
 const logger = require('./logger')('error-handling');
+const { respFail } = require('./response');
 
 /**
  * HTTP 服务引用
  */
 let httpServerRef = null;
+
+/**
+ * 错误代码枚举
+ */
+const ErrorCodes = {
+  Unauthorized: 'Unauthorized',
+  AccessDenied: 'AccessDenied',
+  InvalidRequest: 'InvalidRequest',
+  NotFound: 'NotFound',
+  InternalServerError: 'InternalServerError',
+  ServiceUnavailable: 'ServiceUnavailable',
+  GeneralException: 'GeneralException',
+};
 
 /**
  * 统一错误类
@@ -26,15 +40,21 @@ class AppError extends Error {
     super(message);
 
     const {
-      code = 'GeneralException',
+      code = ErrorCodes.GeneralException,
       HTTPStatus = 500,
       isTrusted = true,
+      target,
+      details,
+      innerError,
       cause,
     } = addition;
 
     this.code = code;
     this.HTTPStatus = HTTPStatus;
     this.isTrusted = isTrusted;
+    if (target) this.target = target;
+    if (details) this.details = details;
+    if (innerError) this.innerError = innerError;
     if (cause) this.cause = cause;
   }
 }
@@ -90,7 +110,9 @@ const handleError = (errorToHandle) => {
 
     // 不可信的错误触发服务和进程关闭
     if (!appError.isTrusted) {
-      terminateHttpServerAndExit();
+      logger.on('finish', () => {
+        terminateHttpServerAndExit();
+      });
     }
 
     return appError;
@@ -135,19 +157,33 @@ const listenToErrorEvents = (httpServer) => {
 /**
  * 处理路由错误的中间件
  * @param {object} ctx 请求的上下文
- * @param {*} next 一个用于执行下游中间件的函数
+ * @param {function} next 一个用于执行下游中间件的函数
  */
 const handleRouteErrors = async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-    const appError = handleError(error);
-    ctx.status = appError ? appError.HTTPStatus : 500;
+    const {
+      code = ErrorCodes.GeneralException,
+      message = 'general exception',
+      HTTPStatus = 500,
+      target,
+      details,
+      innerError,
+    } = handleError(error) || {};
+
+    respFail(ctx, code, message, {
+      status: HTTPStatus,
+      target,
+      details,
+      innerError,
+    });
   }
 };
 
 module.exports = {
   AppError,
+  ErrorCodes,
   handleError,
   listenToErrorEvents,
   handleRouteErrors,

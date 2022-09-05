@@ -26,6 +26,11 @@ const logger = winston.createLogger({
   ),
 });
 
+/**
+ * 记录 API 访问日志的中间件
+ * @param {object} ctx 请求的上下文
+ * @param {function} next 一个用于执行下游中间件的函数
+ */
 module.exports = async (ctx, next) => {
   // 记录请求日志
   logger.info(
