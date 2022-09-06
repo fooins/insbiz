@@ -27,6 +27,8 @@
     "config": "^3.3.7",
     "joi": "^17.6.0",
     "koa": "^2.13.4",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.21.4",
     "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.7.1"
   },

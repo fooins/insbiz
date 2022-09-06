@@ -8,8 +8,10 @@ module.exports = {
     // 端口号
     port: 3306,
     // 用户名
-    user: '',
+    username: '',
     // 密码
     password: '',
+    // 数据库名
+    database: 'insbiz',
   },
 };
