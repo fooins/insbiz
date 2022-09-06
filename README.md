@@ -14,20 +14,26 @@
 │  ├─ default.js  // 默认配置文件
 │  ├─ development.js  // 开发环境配置文件
 │  └─ production.js  // 生产环境配置文件
+│
 ├─ src  // 源代码目录
 │  ├─ components  // 业务组件目录
 │  │  └─ xxx  // 某个业务组件目录
 │  │     ├─ api-routes.js  // HTTP 接口路由
 │  │     ├─ dao.js  // 数据访问对象
 │  │     └─ service.js  // 业务逻辑实现
+│  │
 │  ├─ libraries  // 工具包目录
 │  │  ├─ error-handling.js  // 错误处理工具
 │  │  ├─ logger.js  // 日志工具
 │  │  └─ ...  // 更多工具
+│  │
+│  ├─ models  // 数据库表模型目录
+│  │
 │  ├─ app.js  // 程序主应用实现
 │  ├─ router.js  // HTTP 路由实现
 │  ├─ server.js  // HTTP 服务实现
 │  └─ start.js  // 程序启动入口
+│
 └─ REST-API-reference-latest.md  // REST API 参考文档
 ```
 

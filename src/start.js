@@ -1,6 +1,7 @@
 const { startHttpServer } = require('./server');
 const logger = require('./libraries/logger')('start');
 const { validateConfigs } = require('./libraries/configuration');
+const { getDbConnection } = require('./libraries/data-access');
 const {
   handleError,
   AppError,
@@ -11,6 +12,9 @@ const {
   try {
     validateConfigs();
     logger.info('所有配置校验通过');
+
+    await getDbConnection().authenticate();
+    logger.info('数据库连接成功');
 
     const addressInfo = await startHttpServer();
     logger.info('HTTP 服务启动成功', { addressInfo });
