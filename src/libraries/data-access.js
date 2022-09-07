@@ -6,7 +6,7 @@ let dbConnection;
 
 /**
  * 获取数据库连接
- * @returns Sequelize 实例
+ * @returns {Sequelize} Sequelize 实例
  */
 const getDbConnection = () => {
   if (!dbConnection) {
