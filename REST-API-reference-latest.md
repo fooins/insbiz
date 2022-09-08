@@ -58,7 +58,7 @@
 |   404    | 未找到 (Not Found)                        | 所请求的资源不存在。                                       |
 |   405    | 方法不允许 (Method Not Allowed)           | 请求中的 HTTP 方法在资源上不允许。                         |
 |   406    | 不接受 (Not Acceptable)                   | 该服务不支持 “Accept” 标头中请求的格式。                   |
-|   413    | 请求实体太大 (Request Entity Too Large)   | 请请求的大小超出最大限制。                                 |
+|   413    | 请求实体太大 (Request Entity Too Large)   | 请求的大小超出最大限制。                                 |
 |   415    | 媒体类型不受支持 (Unsupported Media Type) | 请求的内容类型的格式不受服务支持。                         |
 |   422    | 实体无法处理 (Unprocessable Entity)       | 无法处理请求，因为语义上不正确。                           |
 |   429    | 请求过多 (Too Many Requests)              | 客户端应用程序已被限制，经过一段时间之后再尝试重复的请求。 |
