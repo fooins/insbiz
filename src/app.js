@@ -3,6 +3,7 @@ const koaBody = require('koa-body');
 const rTracer = require('cls-rtracer');
 const router = require('./router');
 const accessLog = require('./libraries/access-log');
+const authenticator = require('./libraries/authenticator');
 const { handleRouteErrors, AppError } = require('./libraries/error-handling');
 
 // 实例化一个 Koa 应用
@@ -49,6 +50,9 @@ app.use(
     },
   }),
 );
+
+// 鉴权
+app.use(authenticator);
 
 // 设置路由
 app.use(router.routes());
