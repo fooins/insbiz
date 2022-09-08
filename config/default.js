@@ -14,4 +14,9 @@ module.exports = {
     // 数据库名
     database: 'insbiz',
   },
+  // 加密相关配置
+  crypto: {
+    // AES 密钥
+    aesKey: '',
+  },
 };

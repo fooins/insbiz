@@ -4,4 +4,7 @@ module.exports = {
     username: 'root',
     password: '123456',
   },
+  crypto: {
+    aesKey: 'zmb6ja36v6q45ejob1z2upbxy5qd5c9i',
+  },
 };

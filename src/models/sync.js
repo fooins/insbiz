@@ -1,12 +1,13 @@
 const evn = require('../libraries/env');
 const { getDbConnection } = require('../libraries/data-access');
-const { getProducerModel } = require('./index');
+const { getProducerModel, getSecretModel } = require('./index');
 
 const sync = async () => {
   if (evn.isProd()) throw new Error('不允许生产环境执行！');
 
   // 定义模型
   getProducerModel();
+  getSecretModel();
 
   // 将模型同步到数据库（创建对应表）
   await getDbConnection().sync({

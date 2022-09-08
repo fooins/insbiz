@@ -7,9 +7,9 @@ module.exports = function getProducerModel() {
     {
       id: {
         type: DataTypes.INTEGER,
-        comment: '自增ID',
         primaryKey: true,
         autoIncrement: true,
+        comment: '自增ID',
       },
       name: {
         type: DataTypes.STRING(64),
@@ -19,6 +19,7 @@ module.exports = function getProducerModel() {
       code: {
         type: DataTypes.STRING(64),
         allowNull: false,
+        unique: true,
         comment: '渠道编码',
       },
     },

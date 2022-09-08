@@ -6,7 +6,7 @@ const schema = require('./schema');
  */
 const validateConfigs = () => {
   // 获取所有配置项
-  const keys = ['db'];
+  const keys = ['db', 'crypto'];
   const values = {};
   keys.forEach((key) => {
     if (config.has(key)) {
