@@ -5,8 +5,9 @@
   "main": "src/start.js",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon ./src/start.js",
-    "syncDB:dev": "cross-env NODE_ENV=development node ./src/models/sync.js",
-    "lint": "eslint ./src --fix"
+    "lint": "eslint ./src --fix",
+    "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
+    "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
   },
   "pre-commit": [
     "lint"
