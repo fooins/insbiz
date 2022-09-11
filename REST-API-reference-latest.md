@@ -232,9 +232,9 @@ Signature = ""
 ```JSON
 {
   "orderNo": "f8062bebe66f4729bd2d70f227e1222f",
-  "contractNo": "C00001",
+  "contractCode": "C00001",
   "contractVersion": "1",
-  "planNo": "PL0001",
+  "planCode": "PL0001",
   "effectiveTime": "2022-02-02T00:00:00Z",
   "expiryTime": "2022-02-22T23:59:59Z",
   "premium": 12.34,
@@ -272,9 +272,9 @@ Signature = ""
 | 序  | 参数名            | 类型                      |      必需      | 说明                                                                                             |
 | :-: | ----------------- | ------------------------- | :------------: | ------------------------------------------------------------------------------------------------ |
 |  1  | `orderNo`         | 字符串                    |       是       | 订单号。由销售渠道侧定义，长度在 64 个字符之内，仅支持字母、数字、下划线且需保证在渠道侧不重复。 |
-|  2  | `contractNo`      | 字符串                    |       是       | 契约编号。指定所使用的契约。                                                                     |
+|  2  | `contractCode`    | 字符串                    |       是       | 契约代码。指定所使用的契约。                                                                     |
 |  3  | `contractVersion` | 字符串                    |       否       | 契约版本。不传默认使用最新版本。                                                                 |
-|  4  | `planNo`          | 字符串                    | [?](#required) | 计划编号。所选择的保险产品计划。                                                                 |
+|  4  | `planCode`        | 字符串                    | [?](#required) | 计划代码。所选择的保险产品计划。                                                                 |
 |  5  | `effectiveTime`   | UTC 时间                  | [?](#required) | 保单生效时间。                                                                                   |
 |  6  | `expiryTime`      | UTC 时间                  | [?](#required) | 保单终止时间。                                                                                   |
 |  7  | `premium`         | 浮点值                    | [?](#required) | 总保费。精确到两位小数。                                                                         |
@@ -315,11 +315,11 @@ Signature = ""
 {
   "orderNo": "f8062bebe66f4729bd2d70f227e1222f",
   "policyNo": "P000000000000000001",
-  "contractNo": "C00001",
+  "contractCode": "C00001",
   "contractVersion": "1",
-  "productNo": "P00001",
+  "productCode": "P00001",
   "productVersion": "1",
-  "planNo": "PL0001",
+  "planCode": "PL0001",
   "effectiveTime": "2022-02-02T00:00:00Z",
   "expiryTime": "2022-02-22T23:59:59Z",
   "boundTime": "2022-02-02T00:00:00Z",
@@ -361,11 +361,11 @@ Signature = ""
 | :-: | ----------------- | ----------------------------- | :--: | -------------- |
 |  1  | `orderNo`         | 字符串                        |  是  | 订单号。       |
 |  2  | `policyNo`        | 字符串                        |  是  | 保单号。       |
-|  3  | `contractNo`      | 字符串                        |  是  | 契约编号。     |
+|  3  | `contractCode`    | 字符串                        |  是  | 契约代码。     |
 |  4  | `contractVersion` | 字符串                        |  是  | 契约版本。     |
-|  5  | `productNo`       | 字符串                        |  是  | 产品编号。     |
+|  5  | `productCode`     | 字符串                        |  是  | 产品代码。     |
 |  7  | `productVersion`  | 字符串                        |  是  | 产品版本。     |
-|  8  | `planNo`          | 字符串                        |  是  | 计划编号。     |
+|  8  | `planCode`        | 字符串                        |  是  | 计划代码。     |
 |  9  | `effectiveTime`   | UTC 时间                      |  是  | 保单生效时间。 |
 | 10  | `expiryTime`      | UTC 时间                      |  是  | 保单终止时间。 |
 | 11  | `boundTime`       | UTC 时间                      |  是  | 承保时间。     |
@@ -413,11 +413,11 @@ Signature = ""
 
 ```JSON
 {
-  "contractNo": "C00001",
+  "contractCode": "C00001",
   "contractVersion": "1",
-  "productNo": "P00001",
+  "productCode": "P00001",
   "productVersion": "1",
-  "planNo": "PL0001",
+  "planCode": "PL0001",
   "effectiveTime": "2022-02-02T00:00:00Z",
   "expiryTime": "2022-02-22T23:59:59Z",
   "premium": 12.34,
@@ -443,11 +443,11 @@ Signature = ""
 
 | 序  | 参数名            | 类型                                  | 必需 | 说明                                   |
 | :-: | ----------------- | ------------------------------------- | :--: | -------------------------------------- |
-|  1  | `contractNo`      | 字符串                                |  是  | 契约编号。                             |
+|  1  | `contractCode`    | 字符串                                |  是  | 契约代码。                             |
 |  2  | `contractVersion` | 字符串                                |  是  | 契约版本。                             |
-|  3  | `productNo`       | 字符串                                |  是  | 产品编号。                             |
+|  3  | `productCode`     | 字符串                                |  是  | 产品代码。                             |
 |  4  | `productVersion`  | 字符串                                |  是  | 产品版本。                             |
-|  5  | `planNo`          | 字符串                                |  是  | 计划编号。                             |
+|  5  | `planCode`        | 字符串                                |  是  | 计划代码。                             |
 |  6  | `effectiveTime`   | UTC 时间                              |  是  | 保单生效时间。                         |
 |  7  | `expiryTime`      | UTC 时间                              |  是  | 保单终止时间。                         |
 |  8  | `premium`         | 浮点值                                |  是  | 总保费。                               |
@@ -560,7 +560,7 @@ Signature = ""
 ```JSON
 {
   "policyNo": "P000000000000000001",
-  "planNo": "PL0001",
+  "planCode": "PL0001",
   "effectiveTime": "2022-02-02T00:00:00Z",
   "expiryTime": "2022-02-22T23:59:59Z",
   "applicants": [
@@ -598,7 +598,7 @@ Signature = ""
 | 序  | 参数名          | 类型                              | 必需 | 说明           |
 | :-: | --------------- | --------------------------------- | :--: | -------------- |
 |  1  | `policyNo`      | 字符串                            |  是  | 保单号。       |
-|  2  | `planNo`        | 字符串                            |  否  | 计划编号。     |
+|  2  | `planCode`      | 字符串                            |  否  | 计划代码。     |
 |  3  | `effectiveTime` | UTC 时间                          |  否  | 保单生效时间。 |
 |  4  | `expiryTime`    | UTC 时间                          |  否  | 保单终止时间。 |
 |  5  | `applicants`    | [投保人](#endorse-applicants)数组 |  否  | 投保人。       |
