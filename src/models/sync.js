@@ -1,6 +1,12 @@
 const evn = require('../libraries/env');
 const { getDbConnection } = require('../libraries/data-access');
-const { getProducerModel, getSecretModel } = require('./index');
+const {
+  getProducerModel,
+  getSecretModel,
+  getContractModel,
+  getPlanModel,
+  getProductModel,
+} = require('./index');
 
 /**
  * 同步所有模型到数据库
@@ -14,6 +20,9 @@ module.exports = async function syncModels(options = {}) {
   // 定义模型
   getProducerModel();
   getSecretModel();
+  getContractModel();
+  getPlanModel();
+  getProductModel();
 
   // 将模型同步到数据库（创建对应表）
   await getDbConnection().sync({

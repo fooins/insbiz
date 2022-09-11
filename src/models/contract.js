@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 const { getDbConnection } = require('../libraries/data-access');
 
-module.exports = function getSecretModel() {
+module.exports = function getContractModel() {
   return getDbConnection().define(
-    'Secret',
+    'Contract',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -11,25 +11,31 @@ module.exports = function getSecretModel() {
         autoIncrement: true,
         comment: '自增ID',
       },
-      secretId: {
-        type: DataTypes.STRING(128),
+      code: {
+        type: DataTypes.STRING(64),
         allowNull: false,
-        unique: true,
-        comment: '密钥标识',
+        unique: 'uni_code_version',
+        comment: '契约代码',
       },
-      secretKey: {
-        type: DataTypes.STRING(256),
+      version: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        comment: '密钥',
+        unique: 'uni_code_version',
+        comment: '契约版本',
       },
       producerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         comment: '所属渠道ID',
       },
+      bizConfig: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '业务规则配置(JSON格式)',
+      },
     },
     {
-      comment: '密钥表',
+      comment: '契约表',
     },
   );
 };
