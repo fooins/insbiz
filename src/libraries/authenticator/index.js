@@ -145,5 +145,5 @@ module.exports = async function authenticator(ctx, next) {
   setContext(ctx, authInfo);
 
   // 执行下游中间件
-  next();
+  await next();
 };
