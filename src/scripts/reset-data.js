@@ -57,6 +57,8 @@ const resetData = async () => {
     code: 'C001',
     version: 1,
     producerId: producer.id,
+    productId: product.id,
+    productVersion: product.version,
   });
 };
 

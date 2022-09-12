@@ -28,6 +28,16 @@ module.exports = function getContractModel() {
         allowNull: false,
         comment: '所属渠道ID',
       },
+      productId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: '关联产品ID',
+      },
+      productVersion: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: '关联产品版本号',
+      },
       bizConfig: {
         type: DataTypes.TEXT,
         allowNull: true,
