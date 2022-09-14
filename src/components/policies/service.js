@@ -35,8 +35,9 @@ const basalValidation = async (reqData, profile) => {
   // 查询销售渠道
   const producer = await dao.getProducerByCode(profile.producer.code);
   if (!producer) throw error500('获取销售渠道信息失败');
+  else context.producer = producer;
 
-  // 检查订单号 渠道编码
+  // 检查订单号
   const exists = await dao.getPolicyByOrderNo(policyData.orderNo, producer.id, {
     attributes: ['id'],
   });
@@ -54,6 +55,7 @@ const basalValidation = async (reqData, profile) => {
     context.contract = contract;
     context.product = contract.Product;
   }
+  if (contract.producerId !== producer.id) throw error400('契约不属于当前渠道');
 
   return { context, policyData };
 };
