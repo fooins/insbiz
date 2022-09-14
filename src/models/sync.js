@@ -6,6 +6,7 @@ const {
   getContractModel,
   getPlanModel,
   getProductModel,
+  getPolicyModel,
 } = require('./index');
 
 /**
@@ -23,6 +24,7 @@ module.exports = async function syncModels(options = {}) {
   getContractModel();
   getPlanModel();
   getProductModel();
+  getPolicyModel();
 
   // 将模型同步到数据库（创建对应表）
   await getDbConnection().sync({
