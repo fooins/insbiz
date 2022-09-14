@@ -25,7 +25,7 @@ module.exports = function getSecretModel() {
       producerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        comment: '渠道ID',
+        comment: '所属渠道ID',
       },
     },
     {

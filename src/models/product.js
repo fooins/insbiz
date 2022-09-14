@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 const { getDbConnection } = require('../libraries/data-access');
 
-module.exports = function getProducerModel() {
+module.exports = function getProductModel() {
   return getDbConnection().define(
-    'Producer',
+    'Product',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -14,13 +14,19 @@ module.exports = function getProducerModel() {
       name: {
         type: DataTypes.STRING(64),
         allowNull: false,
-        comment: '渠道名称',
+        comment: '产品名称',
       },
       code: {
         type: DataTypes.STRING(64),
         allowNull: false,
-        unique: true,
-        comment: '渠道编码',
+        unique: 'uni_code_version',
+        comment: '产品代码',
+      },
+      version: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: 'uni_code_version',
+        comment: '产品版本',
       },
       bizConfig: {
         type: DataTypes.TEXT,
@@ -29,7 +35,7 @@ module.exports = function getProducerModel() {
       },
     },
     {
-      comment: '销售渠道表',
+      comment: '保险产品表',
     },
   );
 };

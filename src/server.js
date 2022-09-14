@@ -1,6 +1,11 @@
 const app = require('./app');
 const logger = require('./libraries/logger')('server');
-const { listenToErrorEvents } = require('./libraries/error-handling');
+const { respFail } = require('./libraries/response');
+const {
+  listenToErrorEvents,
+  handleError,
+  ErrorCodes,
+} = require('./libraries/error-handling');
 
 /**
  * 服务实例
@@ -22,6 +27,25 @@ const startHttpServer = async () =>
     httpServer = app.listen(port, hostname, () => {
       listenToErrorEvents(httpServer);
       resolve(httpServer.address());
+    });
+
+    // 监听错误事件
+    app.on('error', (error, ctx) => {
+      const {
+        code = ErrorCodes.GeneralException,
+        message = 'general exception',
+        HTTPStatus = 500,
+        target,
+        details,
+        innerError,
+      } = handleError(error) || {};
+
+      respFail(ctx, code, message, {
+        status: HTTPStatus,
+        target,
+        details,
+        innerError,
+      });
     });
   });
 
