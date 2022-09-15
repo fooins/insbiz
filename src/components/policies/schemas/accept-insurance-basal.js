@@ -7,4 +7,5 @@ module.exports = Joi.object({
     .required(),
   contractCode: Joi.string().required(),
   contractVersion: Joi.string(),
+  planCode: Joi.string().required(),
 });

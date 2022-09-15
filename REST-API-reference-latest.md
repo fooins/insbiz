@@ -274,7 +274,7 @@ Signature = ""
 |  1  | `orderNo`         | 字符串                    |       是       | 订单号。由销售渠道侧定义，长度在 64 个字符之内，仅支持字母、数字、下划线且需保证在渠道侧不重复。 |
 |  2  | `contractCode`    | 字符串                    |       是       | 契约代码。指定所使用的契约。                                                                     |
 |  3  | `contractVersion` | 字符串                    |       否       | 契约版本。不传默认使用最新版本。                                                                 |
-|  4  | `planCode`        | 字符串                    | [?](#required) | 计划代码。所选择的保险产品计划。                                                                 |
+|  4  | `planCode`        | 字符串                    |       是       | 计划代码。所选择的保险产品计划。                                                                 |
 |  5  | `effectiveTime`   | UTC 时间                  | [?](#required) | 保单生效时间。                                                                                   |
 |  6  | `expiryTime`      | UTC 时间                  | [?](#required) | 保单终止时间。                                                                                   |
 |  7  | `premium`         | 浮点值                    | [?](#required) | 总保费。精确到两位小数。                                                                         |

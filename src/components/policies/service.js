@@ -31,6 +31,7 @@ const basalValidation = async (reqData, profile) => {
       orderNo: value.orderNo,
       contractCode: value.contractCode,
       contractVersion: value.contractVersion,
+      planCode: value.planCode,
     };
   }
 
@@ -62,6 +63,20 @@ const basalValidation = async (reqData, profile) => {
     context.product = contract.Product;
   }
   if (contract.producerId !== producer.id) throw error400('契约不属于当前渠道');
+
+  // 检查计划
+  const plan = await dao.getPlanByCode(
+    context.policyData.planCode,
+    context.product.version,
+  );
+  if (!plan) {
+    throw error400('保险产品计划不存在');
+  } else {
+    context.plan = plan;
+  }
+  if (plan.productId !== context.product.id) {
+    throw error400('计划不属于当前保险产品');
+  }
 
   return context;
 };
