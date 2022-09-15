@@ -6,11 +6,11 @@ const { error400, error500 } = require('../../libraries/utils');
  * 执行基本校验
  * @param {object} reqData 请求数据
  * @param {object} profile 身份数据
- * @returns {object}
+ * @returns {object} 上下文
  */
 const basalValidation = async (reqData, profile) => {
-  const context = {}; // 保留上下文信息
-  const policyData = {}; // 校验通过的保单数据
+  // 上下文对象
+  const context = {};
 
   // 字段校验
   const { error, value } = basalSchema.validate(reqData, {
@@ -27,26 +27,32 @@ const basalValidation = async (reqData, profile) => {
       cause: error,
     });
   } else {
-    policyData.orderNo = value.orderNo;
-    policyData.contractCode = value.contractCode;
-    policyData.contractVersion = value.contractVersion;
+    context.policyData = {
+      orderNo: value.orderNo,
+      contractCode: value.contractCode,
+      contractVersion: value.contractVersion,
+    };
   }
 
   // 查询销售渠道
   const producer = await dao.getProducerByCode(profile.producer.code);
   if (!producer) throw error500('获取销售渠道信息失败');
-  else context.producer = producer;
+  context.producer = producer;
 
   // 检查订单号
-  const exists = await dao.getPolicyByOrderNo(policyData.orderNo, producer.id, {
-    attributes: ['id'],
-  });
+  const exists = await dao.getPolicyByOrderNo(
+    context.policyData.orderNo,
+    producer.id,
+    {
+      attributes: ['id'],
+    },
+  );
   if (exists) throw error400('订单号已存在', { target: 'orderNo' });
 
   // 检查契约
   const contract = await dao.getContractByCode(
-    policyData.contractCode,
-    policyData.contractVersion,
+    context.policyData.contractCode,
+    context.policyData.contractVersion,
     { includeProduct: true },
   );
   if (!contract) {
@@ -57,22 +63,21 @@ const basalValidation = async (reqData, profile) => {
   }
   if (contract.producerId !== producer.id) throw error400('契约不属于当前渠道');
 
-  return { context, policyData };
+  return context;
 };
 
 /**
  * 承保
  * @param {object} reqData 请求参数
  * @param {object} profile 身份信息
- * @returns {object}
+ * @returns {object} 响应的数据
  */
 const acceptInsurance = async (reqData, profile) => {
   // 基础校验
-  const { context, policyData } = await basalValidation(reqData, profile);
+  const context = await basalValidation(reqData, profile);
 
   return {
     context,
-    policyData,
   };
 };
 
