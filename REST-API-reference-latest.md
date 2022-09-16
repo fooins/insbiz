@@ -278,7 +278,7 @@ Signature = ""
 |  5  | `effectiveTime`   | UTC 时间                  | [?](#required) | 保单生效时间。                                                                                   |
 |  6  | `expiryTime`      | UTC 时间                  | [?](#required) | 保单终止时间。                                                                                   |
 |  7  | `premium`         | 浮点值                    | [?](#required) | 总保费。精确到两位小数。                                                                         |
-|  8  | `applicants`      | [投保人](#applicants)数组 |       是       | 投保人。                                                                                         |
+|  8  | `applicants`      | [投保人](#applicants)数组 | [?](#required) | 投保人。                                                                                         |
 |  9  | `insureds`        | [被保险人](#insureds)数组 |       是       | 被保险人。                                                                                       |
 
 <p id="applicants">投保人：</p>

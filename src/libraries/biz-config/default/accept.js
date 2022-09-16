@@ -1,13 +1,4 @@
 module.exports = {
-  // 保险产品计划相关
-  plan: {
-    // 是否必须
-    required: true,
-    // 默认值
-    default: null,
-    // 是否允许客户端进行设置
-    allowClientToSet: true,
-  },
   // 保障期间相关
   period: {
     // 是否必须

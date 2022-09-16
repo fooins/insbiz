@@ -35,6 +35,12 @@ const error500 = (message, options = {}) =>
       : true,
   });
 
+/**
+ * 确定对象是否具有具有指定名称的属性
+ * @param {object} obj 指定对象
+ * @param {string} propertyKey 指定名称
+ * @returns {boolean}
+ */
 const hasOwnProperty = (obj, propertyKey) =>
   Object.prototype.hasOwnProperty.call(obj, propertyKey);
 

@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-module.exports = Joi.object({
+module.exports = {
   orderNo: Joi.string()
     .max(64)
     .pattern(/^[a-zA-Z0-9_]*$/)
@@ -8,4 +8,4 @@ module.exports = Joi.object({
   contractCode: Joi.string().required(),
   contractVersion: Joi.string(),
   planCode: Joi.string().required(),
-});
+};
