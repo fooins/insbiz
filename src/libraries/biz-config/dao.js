@@ -18,7 +18,7 @@ const getProductBizConfig = async (productCode, productVersion) => {
     where: { code: productCode, version: productVersion },
   });
 
-  if (!product) {
+  if (!product || !product.bizConfig) {
     return {};
   }
 
@@ -41,7 +41,7 @@ const getPlanBizConfig = async (planCode, planVersion) => {
     where: { code: planCode, version: planVersion },
   });
 
-  if (!plan) {
+  if (!plan || !plan.bizConfig) {
     return {};
   }
 
@@ -64,7 +64,7 @@ const getContractBizConfig = async (contractCode, contractVersion) => {
     where: { code: contractCode, version: contractVersion },
   });
 
-  if (!contract) {
+  if (!contract || !contract.bizConfig) {
     return {};
   }
 
@@ -86,7 +86,7 @@ const getProducerBizConfig = async (producerCode) => {
     where: { code: producerCode },
   });
 
-  if (!producer) {
+  if (!producer || !producer.bizConfig) {
     return {};
   }
 

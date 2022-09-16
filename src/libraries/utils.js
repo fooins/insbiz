@@ -35,7 +35,11 @@ const error500 = (message, options = {}) =>
       : true,
   });
 
+const hasOwnProperty = (obj, propertyKey) =>
+  Object.prototype.hasOwnProperty.call(obj, propertyKey);
+
 module.exports = {
   error400,
   error500,
+  hasOwnProperty,
 };
