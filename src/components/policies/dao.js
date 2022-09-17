@@ -4,6 +4,7 @@ const {
   getPolicyModel,
   getContractModel,
   getProductModel,
+  getPlanModel,
 } = require('../../models');
 
 /**
@@ -32,7 +33,7 @@ const getPolicyByOrderNo = (orderNo, producerId, options = {}) =>
 /**
  * 通过契约代码获取契约信息
  * @param {string} code 契约代码
- * @param {number} version 契约代码
+ * @param {number} version 契约版本号
  * @param {object} options 选项
  * @returns {object} 契约信息
  */
@@ -64,8 +65,20 @@ const getContractByCode = async (code, version, options = {}) => {
   return Contract.findOne(params);
 };
 
+/**
+ * 通过计划代码获取计划信息
+ * @param {string} code 计划代码
+ * @param {number} version 计划版本号（同产品版本号）
+ * @returns {object} 计划信息
+ */
+const getPlanByCode = (code, version) =>
+  getPlanModel().findOne({
+    where: { code, version },
+  });
+
 module.exports = {
   getPolicyByOrderNo,
   getProducerByCode,
   getContractByCode,
+  getPlanByCode,
 };

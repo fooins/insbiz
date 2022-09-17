@@ -1,13 +1,4 @@
 module.exports = {
-  // 保险产品计划相关
-  plan: {
-    // 是否必须
-    required: true,
-    // 默认值
-    default: null,
-    // 是否允许客户端进行设置
-    allowClientToSet: true,
-  },
   // 保障期间相关
   period: {
     // 是否必须
@@ -38,7 +29,7 @@ module.exports = {
       maximum: {
         relative: 'after',
         unit: 'day',
-        amount: 1,
+        amount: 30,
       },
       // 是否允许客户端进行设置
       allowClientToSet: true,
@@ -81,7 +72,7 @@ module.exports = {
     // fixed: 固定值
     // adoptClient: 直接使用客户端指定的值
     // formula: 使用公式计算
-    calculateMode: 'fixed',
+    calculateMode: 'formula',
     // 固定值
     fixed: 0.0,
     // 公式
@@ -158,7 +149,7 @@ module.exports = {
         // year:周岁 month:月 day:日
         unit: 'year',
         // 年龄值
-        value: 18,
+        value: 60,
       },
     },
     // 联系号码
@@ -259,7 +250,7 @@ module.exports = {
         // year:周岁 month:月 day:日
         unit: 'year',
         // 年龄值
-        value: 18,
+        value: 60,
       },
     },
     // 联系号码

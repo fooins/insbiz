@@ -1,3 +1,4 @@
+const { error500 } = require('../utils');
 const {
   getProducerModel,
   getContractModel,
@@ -17,10 +18,15 @@ const getProductBizConfig = async (productCode, productVersion) => {
     where: { code: productCode, version: productVersion },
   });
 
-  if (!product) {
+  if (!product || !product.bizConfig) {
     return {};
   }
-  return JSON.parse(product.bizConfig);
+
+  try {
+    return JSON.parse(product.bizConfig);
+  } catch (error) {
+    throw error500('产品信息有误(bizConig)', { cause: error });
+  }
 };
 
 /**
@@ -35,10 +41,15 @@ const getPlanBizConfig = async (planCode, planVersion) => {
     where: { code: planCode, version: planVersion },
   });
 
-  if (!plan) {
+  if (!plan || !plan.bizConfig) {
     return {};
   }
-  return JSON.parse(plan.bizConfig);
+
+  try {
+    return JSON.parse(plan.bizConfig);
+  } catch (error) {
+    throw error500('计划信息有误(bizConig)', { cause: error });
+  }
 };
 
 /**
@@ -53,10 +64,15 @@ const getContractBizConfig = async (contractCode, contractVersion) => {
     where: { code: contractCode, version: contractVersion },
   });
 
-  if (!contract) {
+  if (!contract || !contract.bizConfig) {
     return {};
   }
-  return JSON.parse(contract.bizConfig);
+
+  try {
+    return JSON.parse(contract.bizConfig);
+  } catch (error) {
+    throw error500('契约信息有误(bizConig)', { cause: error });
+  }
 };
 
 /**
@@ -70,11 +86,15 @@ const getProducerBizConfig = async (producerCode) => {
     where: { code: producerCode },
   });
 
-  if (!producer) {
+  if (!producer || !producer.bizConfig) {
     return {};
   }
 
-  return JSON.parse(producer.bizConfig);
+  try {
+    return JSON.parse(producer.bizConfig);
+  } catch (error) {
+    throw error500('渠道信息有误(bizConig)', { cause: error });
+  }
 };
 
 module.exports = {
