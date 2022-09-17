@@ -57,35 +57,9 @@ const getPeriodSchema = (bizConfig) => {
   if (!expiryTime.allowClientToSet) {
     // 不允许客户端进行设置（传入）
     delete schema.expiryTime;
-  } else {
-    const { minimum, maximum, correctTo } = expiryTime;
-
+  } else if (required) {
     // 必传
-    if (required) {
-      schema.expiryTime = schema.expiryTime.required();
-    }
-
-    // 最小值
-    schema.expiryTime = schema.expiryTime.min(
-      timeCorrectTo(
-        moment(now)[actionRelativeMap[minimum.relative]](
-          minimum.amount,
-          minimum.unit,
-        ),
-        correctTo,
-      ).format(),
-    );
-
-    // 最大值
-    schema.expiryTime = schema.expiryTime.max(
-      timeCorrectTo(
-        moment(now)[actionRelativeMap[maximum.relative]](
-          maximum.amount,
-          maximum.unit,
-        ),
-        correctTo,
-      ).format(),
-    );
+    schema.expiryTime = schema.expiryTime.required();
   }
 
   return schema;
