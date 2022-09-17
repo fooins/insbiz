@@ -4,7 +4,7 @@ const { error400, error500 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
 const basalSchema = require('./schemas/basal');
-const adjustSchema = require('./adjust-schema');
+const { adjustSchema } = require('./adjust-schema');
 const adjustPolicyData = require('./adjust-policy-data');
 
 /**
@@ -107,7 +107,7 @@ const bizValidation = async (ctx, reqData) => {
   });
 
   // 根据业务规则配置调整校验模式
-  const bizSchema = adjustSchema(ctx, bizConfig);
+  const bizSchema = adjustSchema(bizConfig);
 
   // 执行业务规则校验
   const { error, value } = Joi.object(bizSchema).validate(reqDataBiz);
