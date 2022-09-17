@@ -3,7 +3,7 @@ const _ = require('lodash');
 const { error400, error500 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
-const { adjustSchema } = require('./adjust-schema');
+const { getBizSchema } = require('./biz-schema');
 const adjustPolicyData = require('./adjust-policy-data');
 
 /**
@@ -118,11 +118,11 @@ const bizValidation = async (ctx, reqData) => {
     contract,
   });
 
-  // 根据业务规则配置调整校验模式
-  const bizSchema = adjustSchema(bizConfig);
+  // 根据业务规则配置获取对应的校验模式
+  const bizSchema = getBizSchema(bizConfig);
 
   // 执行业务规则校验
-  const { error, value } = Joi.object(bizSchema).validate(reqDataBiz);
+  const { error, value } = bizSchema.validate(reqDataBiz);
   if (error) {
     const {
       details: [{ path }],

@@ -1,24 +1,21 @@
 const moment = require('moment');
 const Joi = require('joi');
-const bizSchemaDefault = require('./schemas/biz-default');
 const { timeCorrectTo } = require('../../../../libraries/utils');
 
 /**
- * 根据业务规则配置（保障期间相关）
- * 调整校验模式（保障期间相关）
+ * 根据业务规则配置获取对应的校验模式
  * @param {object} bizConfig 业务规则配置（保障期间相关）
- * @returns {object} 调整后的校验模式（保障期间相关）
+ * @returns {object} 校验模式（保障期间相关）
  */
-const adjustPeriod = (bizConfig) => {
+const getPeriodSchema = (bizConfig) => {
   const { required, effectiveTime, expiryTime } = bizConfig;
   const actionRelativeMap = { before: 'subtract', after: 'add' };
   const now = Date.now();
 
-  // 初始化
-  // 调整后的校验模式（保障期间相关）
+  // 默认校验模式
   const schema = {
-    effectiveTime: bizSchemaDefault.effectiveTime,
-    expiryTime: bizSchemaDefault.expiryTime,
+    effectiveTime: Joi.date().iso(),
+    expiryTime: Joi.date().iso().greater(Joi.ref('effectiveTime')),
   };
 
   // 保单生效时间
@@ -95,18 +92,16 @@ const adjustPeriod = (bizConfig) => {
 };
 
 /**
- * 根据业务规则配置（保费相关）
- * 调整校验模式（保费相关）
+ * 根据业务规则配置获取对应的校验模式
  * @param {object} bizConfig 业务规则配置（保费相关）
- * @returns {object} 调整后的校验模式（保费相关）
+ * @returns {object} 校验模式（保费相关）
  */
-const adjustPremium = (bizConfig) => {
+const getPremiumSchema = (bizConfig) => {
   const { calculateMode, minimum, maximum } = bizConfig;
 
-  // 初始化
-  // 调整后的校验模式（保费相关）
+  // 默认校验模式
   const schema = {
-    premium: bizSchemaDefault.premium,
+    premium: Joi.number().positive().precision(2),
   };
 
   // 使用固定值
@@ -136,12 +131,11 @@ const adjustPremium = (bizConfig) => {
 };
 
 /**
- * 根据业务规则配置（投保人相关）
- * 调整校验模式（投保人相关）
+ * 根据业务规则配置获取对应的校验模式
  * @param {object} bizConfig 业务规则配置（投保人相关）
- * @returns {object} 调整后的校验模式（投保人相关）
+ * @returns {object} 校验模式（投保人相关）
  */
-const adjustApplicants = (bizConfig) => {
+const getApplicantsSchema = (bizConfig) => {
   const {
     name,
     idType,
@@ -155,8 +149,16 @@ const adjustApplicants = (bizConfig) => {
   } = bizConfig;
   const now = Date.now();
 
-  // 拷贝默认的投保人校验模式
-  let schema = { ...bizSchemaDefault.applicants };
+  // 默认校验模式
+  let schema = {
+    name: Joi.string(),
+    idType: Joi.string().allow('idcard', 'passport'),
+    idNo: Joi.string(),
+    gender: Joi.string().allow('man', 'female', 'other', 'unknown'),
+    birth: Joi.date().iso(),
+    contactNo: Joi.string(),
+    email: Joi.string().email(),
+  };
 
   // 姓名
   if (name.required) {
@@ -255,12 +257,11 @@ const adjustApplicants = (bizConfig) => {
 };
 
 /**
- * 根据业务规则配置（被保险人相关）
- * 调整校验模式（被保险人相关）
+ * 根据业务规则配置获取对应的校验模式
  * @param {object} bizConfig 业务规则配置（被保险人相关）
- * @returns {object} 调整后的校验模式（被保险人相关）
+ * @returns {object} 校验模式（被保险人相关）
  */
-const adjustInsureds = (bizConfig) => {
+const getInsuredsSchema = (bizConfig) => {
   const {
     relationship,
     name,
@@ -275,8 +276,18 @@ const adjustInsureds = (bizConfig) => {
   } = bizConfig;
   const now = Date.now();
 
-  // 拷贝默认的被保险人校验模式
-  let schema = { ...bizSchemaDefault.insureds };
+  // 默认的校验模式
+  let schema = {
+    relationship: Joi.string().allow('self', 'parents', 'brothers', 'sisters'),
+    name: Joi.string(),
+    idType: Joi.string().allow('idcard', 'passport'),
+    idNo: Joi.string(),
+    gender: Joi.string().allow('man', 'female', 'other', 'unknown'),
+    birth: Joi.date().iso(),
+    contactNo: Joi.string(),
+    email: Joi.string().email(),
+    premium: Joi.number().positive().precision(2),
+  };
 
   // 与投保人关系
   if (!relationship.allowClientToSet) {
@@ -391,23 +402,23 @@ const adjustInsureds = (bizConfig) => {
 };
 
 /**
- * 根据业务规则配置调整校验模式
+ * 根据业务规则配置获取对应的校验模式
  * @param {object} bizConfig 业务规则配置
- * @returns {object} 调整后的校验模式
+ * @returns {Joi.ObjectSchema} 校验模式
  */
-const adjustSchema = (bizConfig) => {
+const getBizSchema = (bizConfig) => {
   const { period, premium, applicants, insureds } = bizConfig || {};
 
   const bizSchema = {
-    ...adjustPeriod(period),
-    ...adjustPremium(premium),
-    ...adjustApplicants(applicants),
-    ...adjustInsureds(insureds),
+    ...getPeriodSchema(period),
+    ...getPremiumSchema(premium),
+    ...getApplicantsSchema(applicants),
+    ...getInsuredsSchema(insureds),
   };
 
-  return bizSchema;
+  return Joi.object(bizSchema);
 };
 
 module.exports = {
-  adjustSchema,
+  getBizSchema,
 };
