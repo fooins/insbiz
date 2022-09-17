@@ -29,7 +29,7 @@ module.exports = {
       maximum: {
         relative: 'after',
         unit: 'day',
-        amount: 1,
+        amount: 30,
       },
       // 是否允许客户端进行设置
       allowClientToSet: true,

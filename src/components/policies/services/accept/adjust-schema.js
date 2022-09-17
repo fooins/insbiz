@@ -23,7 +23,7 @@ const adjustPeriod = (bizConfig) => {
   // 保单生效时间
   if (!effectiveTime.allowClientToSet) {
     // 不允许客户端进行设置（传入）
-    schema.effectiveTime = undefined;
+    delete schema.effectiveTime;
   } else {
     const { minimum, maximum } = effectiveTime;
 
@@ -50,7 +50,7 @@ const adjustPeriod = (bizConfig) => {
   // 保单终止时间
   if (!expiryTime.allowClientToSet) {
     // 不允许客户端进行设置（传入）
-    schema.expiryTime = undefined;
+    delete schema.expiryTime;
   } else {
     const { minimum, maximum } = expiryTime;
 
@@ -94,7 +94,7 @@ const adjustPremium = (bizConfig) => {
 
   // 使用固定值
   if (calculateMode === 'fixed') {
-    schema.premium = undefined;
+    delete schema.premium;
   }
   // 直接使用客户端指定的值
   else if (calculateMode === 'adoptClient') {
@@ -149,7 +149,7 @@ const adjustApplicants = (bizConfig) => {
   // 证件类型
   if (!idType.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.idType = undefined;
+    delete schema.idType;
   } else {
     // 必须
     if (idType.required) {
@@ -165,7 +165,7 @@ const adjustApplicants = (bizConfig) => {
   // 证件号码
   if (!idNo.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.idNo = undefined;
+    delete schema.idNo;
   } else if (idNo.required) {
     // 必须
     schema.idNo = schema.idNo.required();
@@ -174,7 +174,7 @@ const adjustApplicants = (bizConfig) => {
   // 性别
   if (!gender.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.gender = undefined;
+    delete schema.gender;
   } else {
     // 必须
     if (gender.required) {
@@ -190,7 +190,7 @@ const adjustApplicants = (bizConfig) => {
   // 出生日期
   if (!birth.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.birth = undefined;
+    delete schema.birth;
   } else {
     // 必须
     if (birth.required) {
@@ -213,7 +213,7 @@ const adjustApplicants = (bizConfig) => {
   // 联系号码
   if (!contactNo.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.contactNo = undefined;
+    delete schema.contactNo;
   } else if (contactNo.required) {
     // 必须
     schema.contactNo = schema.contactNo.required();
@@ -222,7 +222,7 @@ const adjustApplicants = (bizConfig) => {
   // 电子邮箱地址
   if (!email.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.email = undefined;
+    delete schema.email;
   } else if (email.required) {
     // 必须
     schema.email = schema.email.required();
@@ -264,7 +264,7 @@ const adjustInsureds = (bizConfig) => {
   // 与投保人关系
   if (!relationship.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.relationship = undefined;
+    delete schema.relationship;
   } else {
     // 必须
     if (relationship.required) {
@@ -285,7 +285,7 @@ const adjustInsureds = (bizConfig) => {
   // 证件类型
   if (!idType.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.idType = undefined;
+    delete schema.idType;
   } else {
     // 必须
     if (idType.required) {
@@ -301,7 +301,7 @@ const adjustInsureds = (bizConfig) => {
   // 证件号码
   if (!idNo.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.idNo = undefined;
+    delete schema.idNo;
   } else if (idNo.required) {
     // 必须
     schema.idNo = schema.idNo.required();
@@ -310,7 +310,7 @@ const adjustInsureds = (bizConfig) => {
   // 性别
   if (!gender.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.gender = undefined;
+    delete schema.gender;
   } else {
     // 必须
     if (gender.required) {
@@ -326,7 +326,7 @@ const adjustInsureds = (bizConfig) => {
   // 出生日期
   if (!birth.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.birth = undefined;
+    delete schema.birth;
   } else {
     // 必须
     if (birth.required) {
@@ -349,7 +349,7 @@ const adjustInsureds = (bizConfig) => {
   // 联系号码
   if (!contactNo.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.contactNo = undefined;
+    delete schema.contactNo;
   } else if (contactNo.required) {
     // 必须
     schema.contactNo = schema.contactNo.required();
@@ -358,7 +358,7 @@ const adjustInsureds = (bizConfig) => {
   // 电子邮箱地址
   if (!email.allowClientToSet) {
     // 不允许客户端进行设置
-    schema.email = undefined;
+    delete schema.email;
   } else if (email.required) {
     // 必须
     schema.email = schema.email.required();
