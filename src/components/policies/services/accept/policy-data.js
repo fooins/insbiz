@@ -30,11 +30,11 @@ const adjustPeriod = (ctx, bizConfig) => {
   policyData.effectiveTime = timeCorrectTo(
     policyData.effectiveTime,
     effectiveTime.correctTo,
-  );
+  ).toISOString(true);
   policyData.expiryTime = timeCorrectTo(
     policyData.expiryTime,
     expiryTime.correctTo,
-  );
+  ).toISOString(true);
 };
 
 /**
@@ -98,10 +98,14 @@ const adjustApplicants = (ctx, bizConfig) => {
 
     // 出生日期
     if (!applicant.birth) {
-      ref.birth = birth.default;
+      ref.birth = moment(birth.default).toISOString(true);
     }
-    if (applicant.idType === 'idcard' && birth.adoptIdCard) {
-      ref.birth = idCardParsed.birth;
+    if (
+      applicant.idType === 'idcard' &&
+      birth.adoptIdCard &&
+      idCardParsed.birth
+    ) {
+      ref.birth = idCardParsed.birth.toISOString(true);
     }
 
     // 联系号码
@@ -165,10 +169,14 @@ const adjustInsureds = (ctx, bizConfig) => {
 
     // 出生日期
     if (!insured.birth) {
-      ref.birth = birth.default;
+      ref.birth = moment(birth.default).toISOString(true);
     }
-    if (insured.idType === 'idcard' && birth.adoptIdCard) {
-      ref.birth = idCardParsed.birth;
+    if (
+      insured.idType === 'idcard' &&
+      birth.adoptIdCard &&
+      idCardParsed.birth
+    ) {
+      ref.birth = idCardParsed.birth.toISOString(true);
     }
 
     // 联系号码
