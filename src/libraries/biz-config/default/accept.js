@@ -72,7 +72,7 @@ module.exports = {
     // fixed: 固定值
     // adoptClient: 直接使用客户端指定的值
     // formula: 使用公式计算
-    calculateMode: 'fixed',
+    calculateMode: 'formula',
     // 固定值
     fixed: 0.0,
     // 公式

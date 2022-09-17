@@ -151,7 +151,7 @@ const getApplicantsSchema = (bizConfig) => {
 
     // 允许的选项
     if (idType.options && idType.options.length > 0) {
-      schema.idType = schema.idType.valid(...idType.options);
+      schema.idType = schema.idType.valid(Joi.override, ...idType.options);
     }
   }
 
@@ -176,7 +176,7 @@ const getApplicantsSchema = (bizConfig) => {
 
     // 允许的选项
     if (gender.options && gender.options.length > 0) {
-      schema.gender = schema.gender.valid(...gender.options);
+      schema.gender = schema.gender.valid(Joi.override, ...gender.options);
     }
   }
 
@@ -275,7 +275,10 @@ const getInsuredsSchema = (bizConfig) => {
 
     // 允许的选项
     if (relationship.options && relationship.options.length > 0) {
-      schema.relationship = schema.relationship.valid(...relationship.options);
+      schema.relationship = schema.relationship.valid(
+        Joi.override,
+        ...relationship.options,
+      );
     }
   }
 
@@ -296,7 +299,7 @@ const getInsuredsSchema = (bizConfig) => {
 
     // 允许的选项
     if (idType.options && idType.options.length > 0) {
-      schema.idType = schema.idType.valid(...idType.options);
+      schema.idType = schema.idType.valid(Joi.override, ...idType.options);
     }
   }
 
@@ -321,7 +324,7 @@ const getInsuredsSchema = (bizConfig) => {
 
     // 允许的选项
     if (gender.options && gender.options.length > 0) {
-      schema.gender = schema.gender.valid(...gender.options);
+      schema.gender = schema.gender.valid(Joi.override, ...gender.options);
     }
   }
 
