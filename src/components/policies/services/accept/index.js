@@ -3,7 +3,6 @@ const _ = require('lodash');
 const { error400, error500 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
-const basalSchema = require('./schemas/basal');
 const { adjustSchema } = require('./adjust-schema');
 const adjustPolicyData = require('./adjust-policy-data');
 
@@ -14,13 +13,26 @@ const adjustPolicyData = require('./adjust-policy-data');
  * @param {object} profile 身份数据
  */
 const basalValidation = async (ctx, reqData, profile) => {
-  // 字段校验
-  const { error, value } = Joi.object(basalSchema).validate({
-    orderNo: reqData.orderNo || undefined,
-    contractCode: reqData.contractCode || undefined,
-    contractVersion: reqData.contractVersion || undefined,
-    planCode: reqData.planCode || undefined,
+  // 组装待校验的数据
+  const data = {};
+  if (reqData.orderNo) data.orderNo = reqData.orderNo;
+  if (reqData.contractCode) data.contractCode = reqData.contractCode;
+  if (reqData.contractVersion) data.contractVersion = reqData.contractVersion;
+  if (reqData.planCode) data.planCode = reqData.planCode;
+
+  // 校验策略
+  const schema = Joi.object({
+    orderNo: Joi.string()
+      .max(64)
+      .pattern(/^[a-zA-Z0-9_]*$/)
+      .required(),
+    contractCode: Joi.string().required(),
+    contractVersion: Joi.string(),
+    planCode: Joi.string().required(),
   });
+
+  // 字段校验
+  const { error, value } = schema.validate(data);
   if (error) {
     const {
       details: [{ path }],
@@ -93,10 +105,10 @@ const bizValidation = async (ctx, reqData) => {
 
   // 剔除非业务规则相关的参数
   const reqDataBiz = { ...reqData };
-  reqDataBiz.orderNo = undefined;
-  reqDataBiz.contractCode = undefined;
-  reqDataBiz.contractVersion = undefined;
-  reqDataBiz.planCode = undefined;
+  delete reqDataBiz.orderNo;
+  delete reqDataBiz.contractCode;
+  delete reqDataBiz.contractVersion;
+  delete reqDataBiz.planCode;
 
   // 获取业务规则配置
   const { accept: bizConfig } = await getBizConfig({
