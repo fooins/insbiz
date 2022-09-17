@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const defaultConfig = require('./default');
-const { error500, hasOwnProperty } = require('../utils');
+const { error500 } = require('../utils');
 const {
   getProductBizConfig,
   getPlanBizConfig,
@@ -48,7 +48,7 @@ const getBizConfig = async (options) => {
 
   // 获取产品中的配置
   let productConifg = {};
-  if (hasOwnProperty(product, 'bizConfig')) {
+  if (product.bizConfig !== undefined) {
     productConifg = parseBizConfig(product.bizConfig);
   } else {
     productConifg = await getProductBizConfig(product.code, product.version);
@@ -56,7 +56,7 @@ const getBizConfig = async (options) => {
 
   // 获取计划中的配置
   let planConifg = {};
-  if (hasOwnProperty(plan, 'bizConfig')) {
+  if (plan.bizConfig !== undefined) {
     planConifg = parseBizConfig(plan.bizConfig);
   } else {
     planConifg = await getPlanBizConfig(plan.code, plan.version);
@@ -64,7 +64,7 @@ const getBizConfig = async (options) => {
 
   // 获取渠道中的配置
   let producerConifg = {};
-  if (hasOwnProperty(producer, 'bizConfig')) {
+  if (producer.bizConfig !== undefined) {
     producerConifg = parseBizConfig(producer.bizConfig);
   } else {
     producerConifg = await getProducerBizConfig(producer.code);
@@ -72,7 +72,7 @@ const getBizConfig = async (options) => {
 
   // 获取契约中的配置
   let contractConifg = {};
-  if (hasOwnProperty(contract, 'bizConfig')) {
+  if (contract.bizConfig !== undefined) {
     contractConifg = parseBizConfig(contract.bizConfig);
   } else {
     contractConifg = await getContractBizConfig(

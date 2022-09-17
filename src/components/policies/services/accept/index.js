@@ -1,7 +1,11 @@
 const Joi = require('joi');
+const _ = require('lodash');
 const { error400, error500 } = require('../../../../libraries/utils');
+const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
 const basalSchema = require('./schemas/basal');
+const adjustSchema = require('./adjust-schema');
+const adjustPolicyData = require('./adjust-policy-data');
 
 /**
  * 执行基本校验
@@ -79,7 +83,51 @@ const basalValidation = async (ctx, reqData, profile) => {
   }
 };
 
-const bizValidation = async () => {};
+/**
+ * 执行业务规则校验
+ * @param {object} ctx 上下文对象
+ * @param {object} reqData 请求数据
+ */
+const bizValidation = async (ctx, reqData) => {
+  const { product, plan, producer, contract, policyData } = ctx;
+
+  // 剔除非业务规则相关的参数
+  const reqDataBiz = { ...reqData };
+  reqDataBiz.orderNo = undefined;
+  reqDataBiz.contractCode = undefined;
+  reqDataBiz.contractVersion = undefined;
+  reqDataBiz.planCode = undefined;
+
+  // 获取业务规则配置
+  const { accept: bizConfig } = await getBizConfig({
+    product,
+    plan,
+    producer,
+    contract,
+  });
+
+  // 根据业务规则配置调整校验模式
+  const bizSchema = adjustSchema(ctx, bizConfig);
+
+  // 执行业务规则校验
+  const { error, value } = Joi.object(bizSchema).validate(reqDataBiz);
+  if (error) {
+    const {
+      details: [{ path }],
+    } = error;
+
+    throw error400(error.message, {
+      target: path && path[0],
+      cause: error,
+    });
+  } else {
+    ctx.policyData = _.merge(policyData, value);
+  }
+
+  // 根据业务规则调整保单数据
+  adjustPolicyData(ctx, bizConfig);
+};
+
 const charging = async () => {};
 const generatePolicyNumber = async () => {};
 const savePolicyData = async () => {};
