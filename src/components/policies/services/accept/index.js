@@ -3,7 +3,7 @@ const _ = require('lodash');
 const { error400, error500 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
-const { getBizSchema } = require('./biz-schema');
+const { getBizSchema, getBizSchemaForAdjusted } = require('./biz-schema');
 const { adjustPolicyData } = require('./policy-data');
 
 /**
@@ -138,6 +138,27 @@ const bizValidation = async (ctx, reqData) => {
 
   // 根据业务规则调整保单数据
   adjustPolicyData(ctx, bizConfig);
+
+  // 根据业务规则配置获取对应的校验模式
+  // 针对调整后的保单数据
+  const bizSchemaForAdjusted = getBizSchemaForAdjusted(policyData, bizConfig);
+
+  // 执行业务规则校验
+  // 针对调整后的保单数据
+  const { error: err } = bizSchemaForAdjusted.validate(policyData, {
+    allowUnknown: true,
+    stripUnknown: true,
+  });
+  if (err) {
+    const {
+      details: [{ path }],
+    } = err;
+
+    throw error400(err.message, {
+      target: path && path[0],
+      cause: err,
+    });
+  }
 };
 
 const charging = async () => {};

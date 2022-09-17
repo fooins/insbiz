@@ -366,6 +366,90 @@ const getBizSchema = (bizConfig) => {
   return Joi.object(bizSchema);
 };
 
+/**
+ * 根据业务规则配置获取对应的校验模式
+ * 针对调整后的保单数据
+ * @param {object} policyData 保单数据
+ * @param {object} bizConfig 业务规则配置
+ * @returns {Joi.ObjectSchema} 校验模式
+ */
+const getBizSchemaForAdjusted = (policyData, bizConfig) => {
+  const { period, applicants, insureds } = bizConfig || {};
+  const bizSchema = {};
+
+  // 保单终止时间
+  {
+    const { minimum, maximum, correctTo } = period.expiryTime;
+    const actionRelativeMap = { before: 'subtract', after: 'add' };
+
+    // 最小值&最大值
+    bizSchema.expiryTime = Joi.date()
+      .min(
+        timeCorrectTo(
+          moment(policyData.effectiveTime)
+            [actionRelativeMap[minimum.relative]](minimum.amount, minimum.unit)
+            .subtract(1, 'second'),
+          correctTo,
+        ).valueOf(),
+      )
+      .max(
+        timeCorrectTo(
+          moment(policyData.effectiveTime)
+            [actionRelativeMap[maximum.relative]](maximum.amount, maximum.unit)
+            .subtract(1, 'second'),
+          correctTo,
+        ).valueOf(),
+      );
+  }
+
+  // 投保人
+  {
+    const { allowMinAge, allowMaxAge } = applicants.birth;
+
+    // 允许的最小、最大年龄
+    bizSchema.applicants = Joi.array().items(
+      Joi.object({
+        birth: Joi.date()
+          .max(
+            moment(policyData.effectiveTime)
+              .subtract(allowMinAge.value, allowMinAge.unit)
+              .valueOf(),
+          )
+          .min(
+            moment(policyData.effectiveTime)
+              .subtract(allowMaxAge.value, allowMaxAge.unit)
+              .valueOf(),
+          ),
+      }),
+    );
+  }
+
+  // 被保险人
+  {
+    const { allowMinAge, allowMaxAge } = insureds.birth;
+
+    // 允许的最小、最大年龄
+    bizSchema.insureds = Joi.array().items(
+      Joi.object({
+        birth: Joi.date()
+          .max(
+            moment(policyData.effectiveTime)
+              .subtract(allowMinAge.value, allowMinAge.unit)
+              .valueOf(),
+          )
+          .min(
+            moment(policyData.effectiveTime)
+              .subtract(allowMaxAge.value, allowMaxAge.unit)
+              .valueOf(),
+          ),
+      }),
+    );
+  }
+
+  return Joi.object(bizSchema);
+};
+
 module.exports = {
   getBizSchema,
+  getBizSchemaForAdjusted,
 };
