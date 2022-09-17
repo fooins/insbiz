@@ -149,7 +149,7 @@ module.exports = {
         // year:周岁 month:月 day:日
         unit: 'year',
         // 年龄值
-        value: 18,
+        value: 60,
       },
     },
     // 联系号码
@@ -250,7 +250,7 @@ module.exports = {
         // year:周岁 month:月 day:日
         unit: 'year',
         // 年龄值
-        value: 18,
+        value: 60,
       },
     },
     // 联系号码

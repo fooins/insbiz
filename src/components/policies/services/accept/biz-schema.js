@@ -121,7 +121,6 @@ const getApplicantsSchema = (bizConfig) => {
     minimum,
     maximum,
   } = bizConfig;
-  const now = Date.now();
 
   // 默认校验模式
   let schema = {
@@ -184,23 +183,9 @@ const getApplicantsSchema = (bizConfig) => {
   if (!birth.allowClientToSet) {
     // 不允许客户端进行设置
     delete schema.birth;
-  } else {
+  } else if (birth.required) {
     // 必须
-    if (birth.required) {
-      schema.birth = schema.birth.required();
-    }
-
-    // 允许的最小年龄
-    const { allowMinAge } = birth;
-    schema.birth = schema.birth.max(
-      moment(now).subtract(allowMinAge.value, allowMinAge.unit).format(),
-    );
-
-    // 允许的最大年龄
-    const { allowMaxAge } = birth;
-    schema.birth = schema.birth.min(
-      moment(now).subtract(allowMaxAge.value, allowMaxAge.unit).format(),
-    );
+    schema.birth = schema.birth.required();
   }
 
   // 联系号码
@@ -248,7 +233,6 @@ const getInsuredsSchema = (bizConfig) => {
     minimum,
     maximum,
   } = bizConfig;
-  const now = Date.now();
 
   // 默认的校验模式
   let schema = {
@@ -332,23 +316,9 @@ const getInsuredsSchema = (bizConfig) => {
   if (!birth.allowClientToSet) {
     // 不允许客户端进行设置
     delete schema.birth;
-  } else {
+  } else if (birth.required) {
     // 必须
-    if (birth.required) {
-      schema.birth = schema.birth.required();
-    }
-
-    // 允许的最小年龄
-    const { allowMinAge } = birth;
-    schema.birth = schema.birth.max(
-      moment(now).subtract(allowMinAge.value, allowMinAge.unit).format(),
-    );
-
-    // 允许的最大年龄
-    const { allowMaxAge } = birth;
-    schema.birth = schema.birth.min(
-      moment(now).subtract(allowMaxAge.value, allowMaxAge.unit).format(),
-    );
+    schema.birth = schema.birth.required();
   }
 
   // 联系号码
