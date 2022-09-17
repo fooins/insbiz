@@ -1,6 +1,7 @@
 const moment = require('moment');
 const Joi = require('joi');
 const bizSchemaDefault = require('./schemas/biz-default');
+const { timeCorrectTo } = require('../../../../libraries/utils');
 
 /**
  * 根据业务规则配置（保障期间相关）
@@ -25,7 +26,7 @@ const adjustPeriod = (bizConfig) => {
     // 不允许客户端进行设置（传入）
     delete schema.effectiveTime;
   } else {
-    const { minimum, maximum } = effectiveTime;
+    const { minimum, maximum, correctTo } = effectiveTime;
 
     // 必传
     if (required) {
@@ -34,16 +35,24 @@ const adjustPeriod = (bizConfig) => {
 
     // 最小值
     schema.effectiveTime = schema.effectiveTime.min(
-      moment(now)
-        [actionRelativeMap[minimum.relative]](minimum.amount, minimum.unit)
-        .format(),
+      timeCorrectTo(
+        moment(now)[actionRelativeMap[minimum.relative]](
+          minimum.amount,
+          minimum.unit,
+        ),
+        correctTo,
+      ).format(),
     );
 
     // 最大值
     schema.effectiveTime = schema.effectiveTime.max(
-      moment(now)
-        [actionRelativeMap[maximum.relative]](maximum.amount, maximum.unit)
-        .format(),
+      timeCorrectTo(
+        moment(now)[actionRelativeMap[maximum.relative]](
+          maximum.amount,
+          maximum.unit,
+        ),
+        correctTo,
+      ).format(),
     );
   }
 
@@ -52,7 +61,7 @@ const adjustPeriod = (bizConfig) => {
     // 不允许客户端进行设置（传入）
     delete schema.expiryTime;
   } else {
-    const { minimum, maximum } = expiryTime;
+    const { minimum, maximum, correctTo } = expiryTime;
 
     // 必传
     if (required) {
@@ -61,16 +70,24 @@ const adjustPeriod = (bizConfig) => {
 
     // 最小值
     schema.expiryTime = schema.expiryTime.min(
-      moment(now)
-        [actionRelativeMap[minimum.relative]](minimum.amount, minimum.unit)
-        .format(),
+      timeCorrectTo(
+        moment(now)[actionRelativeMap[minimum.relative]](
+          minimum.amount,
+          minimum.unit,
+        ),
+        correctTo,
+      ).format(),
     );
 
     // 最大值
     schema.expiryTime = schema.expiryTime.max(
-      moment(now)
-        [actionRelativeMap[maximum.relative]](maximum.amount, maximum.unit)
-        .format(),
+      timeCorrectTo(
+        moment(now)[actionRelativeMap[maximum.relative]](
+          maximum.amount,
+          maximum.unit,
+        ),
+        correctTo,
+      ).format(),
     );
   }
 
