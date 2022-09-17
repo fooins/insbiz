@@ -86,9 +86,53 @@ const timeCorrectTo = (datetime, unit) => {
   return result;
 };
 
+/**
+ * 解析身份证号码
+ * @param {string} idNo 身份证号码
+ * @returns {object}
+ */
+const parseIdCard = (idNo) => {
+  const result = {
+    gender: 'unknown',
+    birth: null,
+  };
+
+  if (!idNo || (idNo.length !== 18 && idNo.length !== 15)) return result;
+
+  // 性别代码
+  // 二代身份证号码长度为18位（第17位为性别代码）
+  // 一代身份证号码长度为15位（第15位为性别代码）
+  const genderCode = idNo.length === 18 ? idNo.charAt(16) : idNo.charAt(14);
+
+  // 识别性别：男奇女偶
+  if (genderCode && !Number.isNaN(genderCode)) {
+    if (parseInt(genderCode, 10) % 2 === 0) {
+      result.gender = 'female';
+    } else {
+      result.gender = 'man';
+    }
+  }
+
+  // 出生日期编码
+  const birthCode =
+    idNo.length === 18 ? idNo.substring(6, 14) : `19${idNo.substring(6, 12)}`;
+
+  // 识别出生日期
+  result.birth = moment(
+    new Date(
+      birthCode.substring(0, 4),
+      birthCode.substring(4, 6) - 1,
+      birthCode.substring(6, 8),
+    ),
+  );
+
+  return result;
+};
+
 module.exports = {
   error400,
   error500,
   hasOwnProperty,
   timeCorrectTo,
+  parseIdCard,
 };

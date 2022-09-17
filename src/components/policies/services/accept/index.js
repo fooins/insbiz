@@ -4,7 +4,7 @@ const { error400, error500 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
 const { getBizSchema } = require('./biz-schema');
-const adjustPolicyData = require('./adjust-policy-data');
+const { adjustPolicyData } = require('./policy-data');
 
 /**
  * 执行基本校验
