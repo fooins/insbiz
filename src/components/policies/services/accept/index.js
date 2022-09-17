@@ -1,6 +1,7 @@
-const dao = require('./dao');
-const basalSchema = require('./schemas/accept-insurance-basal');
-const { error400, error500 } = require('../../libraries/utils');
+const Joi = require('joi');
+const { error400, error500 } = require('../../../../libraries/utils');
+const dao = require('../../dao');
+const basalSchema = require('./schemas/basal');
 
 /**
  * 执行基本校验
@@ -13,9 +14,11 @@ const basalValidation = async (reqData, profile) => {
   const context = {};
 
   // 字段校验
-  const { error, value } = basalSchema.validate(reqData, {
-    allowUnknown: true,
-    stripUnknown: true,
+  const { error, value } = Joi.object(basalSchema).validate({
+    orderNo: reqData.orderNo || undefined,
+    contractCode: reqData.contractCode || undefined,
+    contractVersion: reqData.contractVersion || undefined,
+    planCode: reqData.planCode || undefined,
   });
   if (error) {
     const {
@@ -81,6 +84,12 @@ const basalValidation = async (reqData, profile) => {
   return context;
 };
 
+const bizValidation = async () => {};
+const charging = async () => {};
+const generatePolicyNumber = async () => {};
+const savePolicyData = async () => {};
+const assembleResponseData = async () => {};
+
 /**
  * 承保
  * @param {object} reqData 请求参数
@@ -91,9 +100,22 @@ const acceptInsurance = async (reqData, profile) => {
   // 基础校验
   const context = await basalValidation(reqData, profile);
 
-  return {
-    context,
-  };
+  // 业务规则校验
+  await bizValidation(context, reqData);
+
+  // 计费
+  await charging(context);
+
+  // 生成保单号
+  await generatePolicyNumber(context);
+
+  // 保存数据
+  await savePolicyData(context);
+
+  // 组装响应数据
+  const responseData = await assembleResponseData(context);
+
+  return responseData;
 };
 
 module.exports = {
