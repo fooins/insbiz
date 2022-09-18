@@ -78,9 +78,44 @@ module.exports = {
     // 公式
     formula: {
       // 名称
-      name: '',
+      name: 'default',
       // 参数
-      params: {},
+      params: {
+        // 基数
+        cardinal: 0,
+        // 计费因子：保障天数
+        days: {
+          // 保障天数区间
+          ranges: [
+            {
+              // 区间开始
+              start: 0,
+              // 区间结束
+              end: 10,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 10,
+            },
+          ],
+        },
+        // 计费因子：被保险人年龄
+        insuredAge: {
+          // 被保险人年龄区间
+          ranges: [
+            {
+              // 区间开始
+              start: 0,
+              // 区间结束
+              end: 18,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 5,
+            },
+          ],
+        },
+      },
     },
     // 允许的最小值
     minimum: 0.0,

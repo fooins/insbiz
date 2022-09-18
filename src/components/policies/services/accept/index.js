@@ -1,8 +1,13 @@
 const Joi = require('joi');
 const _ = require('lodash');
-const { error400, error500 } = require('../../../../libraries/utils');
+const {
+  error400,
+  error500,
+  hasOwnProperty,
+} = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const dao = require('../../dao');
+const formulas = require('./formulas');
 const { getBizSchema, getBizSchemaForAdjusted } = require('./biz-schema');
 const { adjustPolicyData } = require('./policy-data');
 
@@ -117,6 +122,7 @@ const bizValidation = async (ctx, reqData) => {
     producer,
     contract,
   });
+  ctx.bizConfig = bizConfig;
 
   // 根据业务规则配置获取对应的校验模式
   const bizSchema = getBizSchema(bizConfig);
@@ -161,7 +167,52 @@ const bizValidation = async (ctx, reqData) => {
   }
 };
 
-const charging = async () => {};
+/**
+ * 计算保费
+ * @param {object} ctx 上下文对象
+ */
+const charging = async (ctx) => {
+  const { bizConfig, policyData } = ctx;
+  const { calculateMode, formula, minimum, maximum } = bizConfig.premium;
+
+  // 计费
+  if (calculateMode === 'formula') {
+    const { name, params } = formula;
+
+    if (
+      !hasOwnProperty(formulas, name) ||
+      typeof formulas[name] !== 'function'
+    ) {
+      throw error500('计费公式有误');
+    }
+
+    formulas[name](ctx, params);
+  }
+
+  // 校验
+  let totalPremium = 0;
+  policyData.insureds.forEach((insured) => {
+    totalPremium += insured.premium;
+  });
+  if (totalPremium !== policyData.premium) {
+    if (calculateMode === 'adoptClient') {
+      throw error400(`被保险人总保费不等于保单保费`);
+    } else {
+      throw error500(`被保险人总保费不等于保单保费`);
+    }
+  }
+  if (policyData.premium < minimum) {
+    throw error400(`保费不允许小于 ${minimum} 元`, {
+      target: 'premium',
+    });
+  }
+  if (policyData.premium > maximum) {
+    throw error400(`保费不允许大于 ${maximum} 元`, {
+      target: 'premium',
+    });
+  }
+};
+
 const generatePolicyNumber = async () => {};
 const savePolicyData = async () => {};
 const assembleResponseData = async () => {};
