@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const moment = require('moment');
 const _ = require('lodash');
 const {
   error400,
@@ -6,6 +7,7 @@ const {
   hasOwnProperty,
 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
+const { getRedis } = require('../../../../libraries/redis');
 const dao = require('../../dao');
 const formulas = require('./formulas');
 const { getBizSchema, getBizSchemaForAdjusted } = require('./biz-schema');
@@ -213,7 +215,22 @@ const charging = async (ctx) => {
   }
 };
 
-const generatePolicyNumber = async () => {};
+/**
+ * 生成保单号
+ * @param {object} ctx 上下文对象
+ */
+const generatePolicyNo = async (ctx) => {
+  // 获取自增序号
+  const incr = await getRedis().incr('policy-no-incr');
+
+  // 生成保单号
+  const date = moment().format('YYYYMMDD');
+  const incrStr = `${incr}`.padStart(8, '0');
+  const policyNo = `FOOINS${date}${incrStr}`;
+
+  ctx.policyData.policyNo = policyNo;
+};
+
 const savePolicyData = async () => {};
 const assembleResponseData = async () => {};
 
@@ -237,7 +254,7 @@ const acceptInsurance = async (reqData, profile) => {
   await charging(ctx);
 
   // 生成保单号
-  await generatePolicyNumber(ctx);
+  await generatePolicyNo(ctx);
 
   // 保存数据
   await savePolicyData(ctx);

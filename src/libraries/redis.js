@@ -14,6 +14,7 @@ const getRedis = () => {
       port: config.get('redis.port'),
       password: config.get('redis.password'),
       db: config.get('redis.db'),
+      keyPrefix: 'insbiz:',
     });
 
     redis.on('error', (error) => {
