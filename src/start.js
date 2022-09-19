@@ -1,12 +1,24 @@
+const winston = require('winston');
 const { startHttpServer } = require('./server');
-const logger = require('./libraries/logger')('start');
 const { validateConfigs } = require('./libraries/configuration');
 const { getDbConnection } = require('./libraries/data-access');
+const { getRedis } = require('./libraries/redis');
 const {
   handleError,
   AppError,
   ErrorCodes,
 } = require('./libraries/error-handling');
+
+// 创建日志记录器
+const logger = require('./libraries/logger')('start', {
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(
+      (info) => `${info.timestamp}|${process.pid}|${info.message}`,
+    ),
+  ),
+});
 
 (async () => {
   try {
@@ -15,6 +27,10 @@ const {
 
     await getDbConnection().authenticate();
     logger.info('数据库连接成功');
+
+    getRedis().on('connect', () => {
+      logger.info('Redis 连接成功');
+    });
 
     const addressInfo = await startHttpServer();
     logger.info('HTTP 服务启动成功', { addressInfo });

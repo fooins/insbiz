@@ -1,5 +1,4 @@
 const app = require('./app');
-const logger = require('./libraries/logger')('server');
 const { respFail } = require('./libraries/response');
 const {
   listenToErrorEvents,
@@ -23,7 +22,6 @@ const startHttpServer = async () =>
     const hostname = process.env.HOST || '127.0.0.1';
 
     // 创建 HTTP 服务并监听端口
-    logger.info(`正在启动 HTTP 服务 ${hostname}:${port}`);
     httpServer = app.listen(port, hostname, () => {
       listenToErrorEvents(httpServer);
       resolve(httpServer.address());

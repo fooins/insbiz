@@ -1,5 +1,6 @@
 const config = require('config');
 const { Sequelize } = require('sequelize');
+const logger = require('./logger')('data-access', { noConsole: true });
 
 // ️️️在进程中保留一个单例 DB 连接池
 let dbConnection;
@@ -17,6 +18,7 @@ const getDbConnection = () => {
       password: config.get('db.password'),
       database: config.get('db.database'),
       dialect: 'mysql',
+      logging: (msg) => logger.info(msg),
     });
   }
 

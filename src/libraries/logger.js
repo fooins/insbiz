@@ -50,7 +50,7 @@ module.exports = function getLogger(name, options = {}) {
     ];
 
     // 非生产环境同时打印到控制台
-    if (!env.isProd()) {
+    if (!env.isProd() && !options.noConsole) {
       transports.push(new winston.transports.Console());
     }
 

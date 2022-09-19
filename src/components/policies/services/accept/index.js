@@ -1,8 +1,15 @@
 const Joi = require('joi');
+const moment = require('moment');
 const _ = require('lodash');
-const { error400, error500 } = require('../../../../libraries/utils');
+const {
+  error400,
+  error500,
+  hasOwnProperty,
+} = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
+const { getRedis } = require('../../../../libraries/redis');
 const dao = require('../../dao');
+const formulas = require('./formulas');
 const { getBizSchema, getBizSchemaForAdjusted } = require('./biz-schema');
 const { adjustPolicyData } = require('./policy-data');
 
@@ -117,6 +124,7 @@ const bizValidation = async (ctx, reqData) => {
     producer,
     contract,
   });
+  ctx.bizConfig = bizConfig;
 
   // 根据业务规则配置获取对应的校验模式
   const bizSchema = getBizSchema(bizConfig);
@@ -161,8 +169,68 @@ const bizValidation = async (ctx, reqData) => {
   }
 };
 
-const charging = async () => {};
-const generatePolicyNumber = async () => {};
+/**
+ * 计算保费
+ * @param {object} ctx 上下文对象
+ */
+const charging = async (ctx) => {
+  const { bizConfig, policyData } = ctx;
+  const { calculateMode, formula, minimum, maximum } = bizConfig.premium;
+
+  // 计费
+  if (calculateMode === 'formula') {
+    const { name, params } = formula;
+
+    if (
+      !hasOwnProperty(formulas, name) ||
+      typeof formulas[name] !== 'function'
+    ) {
+      throw error500('计费公式有误');
+    }
+
+    formulas[name](ctx, params);
+  }
+
+  // 校验
+  let totalPremium = 0;
+  policyData.insureds.forEach((insured) => {
+    totalPremium += insured.premium;
+  });
+  if (totalPremium !== policyData.premium) {
+    if (calculateMode === 'adoptClient') {
+      throw error400(`被保险人总保费不等于保单保费`);
+    } else {
+      throw error500(`被保险人总保费不等于保单保费`);
+    }
+  }
+  if (policyData.premium < minimum) {
+    throw error400(`保费不允许小于 ${minimum} 元`, {
+      target: 'premium',
+    });
+  }
+  if (policyData.premium > maximum) {
+    throw error400(`保费不允许大于 ${maximum} 元`, {
+      target: 'premium',
+    });
+  }
+};
+
+/**
+ * 生成保单号
+ * @param {object} ctx 上下文对象
+ */
+const generatePolicyNo = async (ctx) => {
+  // 获取自增序号
+  const incr = await getRedis().incr('policy-no-incr');
+
+  // 生成保单号
+  const date = moment().format('YYYYMMDD');
+  const incrStr = `${incr}`.padStart(8, '0');
+  const policyNo = `FOOINS${date}${incrStr}`;
+
+  ctx.policyData.policyNo = policyNo;
+};
+
 const savePolicyData = async () => {};
 const assembleResponseData = async () => {};
 
@@ -186,7 +254,7 @@ const acceptInsurance = async (reqData, profile) => {
   await charging(ctx);
 
   // 生成保单号
-  await generatePolicyNumber(ctx);
+  await generatePolicyNo(ctx);
 
   // 保存数据
   await savePolicyData(ctx);
