@@ -229,9 +229,29 @@ const generatePolicyNo = async (ctx) => {
   const policyNo = `FOOINS${date}${incrStr}`;
 
   ctx.policyData.policyNo = policyNo;
+  ctx.policyData.boundTime = moment().toISOString(true);
 };
 
-const savePolicyData = async () => {};
+/**
+ * 保存保单数据
+ * @param {object} ctx 上下文对象
+ */
+const savePolicyData = async (ctx) => {
+  const { policyData, producer, contract, product, plan, bizConfig } = ctx;
+
+  // 组装保存的数据
+  const saveData = { ...policyData };
+  saveData.producerId = producer.id;
+  saveData.contractId = contract.id;
+  saveData.productId = product.id;
+  saveData.productVersion = product.version;
+  saveData.planId = plan.id;
+  saveData.bizConfig = JSON.stringify(bizConfig);
+
+  // 保存保单
+  ctx.policyDataSaved = await dao.savePolicy(saveData);
+};
+
 const assembleResponseData = async () => {};
 
 /**

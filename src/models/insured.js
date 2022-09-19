@@ -12,7 +12,8 @@ module.exports = function getInsuredModel() {
         comment: '自增ID',
       },
       no: {
-        type: DataTypes.STRING(64),
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         unique: true,
         comment: '编号',

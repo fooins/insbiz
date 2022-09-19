@@ -19,6 +19,7 @@ const getDbConnection = () => {
       database: config.get('db.database'),
       dialect: 'mysql',
       logging: (msg) => logger.info(msg),
+      timezone: '+08:00',
     });
   }
 

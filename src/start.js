@@ -29,11 +29,11 @@ const logger = require('./libraries/logger')('start', {
     logger.info('数据库连接成功');
 
     getRedis().on('connect', () => {
-      logger.info('Redis 连接成功');
+      logger.info('Redis连接成功');
     });
 
     const addressInfo = await startHttpServer();
-    logger.info('HTTP 服务启动成功', { addressInfo });
+    logger.info('HTTP服务启动成功', { addressInfo });
   } catch (error) {
     handleError(
       new AppError(error.message, {
