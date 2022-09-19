@@ -252,7 +252,50 @@ const savePolicyData = async (ctx) => {
   ctx.policyDataSaved = await dao.savePolicy(saveData);
 };
 
-const assembleResponseData = async () => {};
+/**
+ * 组装响应数据
+ * @param {object} ctx 上下文对象
+ */
+const assembleResponseData = (ctx) => {
+  const { policyDataSaved, policyData } = ctx;
+  const { policy, applicants, insureds } = policyDataSaved;
+
+  return {
+    orderNo: policy.orderNo,
+    policyNo: policy.policyNo,
+    contractCode: policyData.contractCode,
+    contractVersion: policyData.contractVersion,
+    productCode: policyData.productCode,
+    productVersion: policyData.productVersion,
+    planCode: policyData.planCode,
+    effectiveTime: policy.effectiveTime,
+    expiryTime: policy.expiryTime,
+    boundTime: policy.boundTime,
+    premium: policy.premium,
+    applicants: applicants.map((applicant) => ({
+      no: applicant.no,
+      name: applicant.name,
+      idType: applicant.idType,
+      idNo: applicant.idNo,
+      gender: applicant.gender,
+      birth: applicant.birth,
+      contactNo: applicant.contactNo,
+      email: applicant.email,
+    })),
+    insureds: insureds.map((insured) => ({
+      no: insured.no,
+      relationship: insured.relationship,
+      name: insured.name,
+      idType: insured.idType,
+      idNo: insured.idNo,
+      gender: insured.gender,
+      birth: insured.birth,
+      contactNo: insured.contactNo,
+      email: insured.email,
+      premium: insured.premium,
+    })),
+  };
+};
 
 /**
  * 承保
@@ -280,7 +323,7 @@ const acceptInsurance = async (reqData, profile) => {
   await savePolicyData(ctx);
 
   // 组装响应数据
-  const responseData = await assembleResponseData(ctx);
+  const responseData = assembleResponseData(ctx);
 
   return responseData;
 };

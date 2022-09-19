@@ -111,7 +111,7 @@ const savePolicy = async (saveData) => {
     await t.commit();
 
     return {
-      ...policy,
+      policy,
       applicants,
       insureds,
     };
