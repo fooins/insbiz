@@ -19,4 +19,15 @@ module.exports = {
     // AES 密钥
     aesKey: '',
   },
+  // Redis
+  redis: {
+    // 主机名
+    host: '127.0.0.1',
+    // 端口号
+    port: 6379,
+    // 密码
+    password: '123456',
+    // 数据库索引
+    db: 0,
+  },
 };
