@@ -309,6 +309,6 @@ module.exports = {
     // 允许的最小被保险人数
     minimum: 1,
     // 允许的最大被保险人数
-    maximum: 1,
+    maximum: 99,
   },
 };
