@@ -17,6 +17,12 @@ module.exports = function getPolicyModel() {
         unique: 'uni_order_no_producer',
         comment: '订单号',
       },
+      policyNo: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        unique: true,
+        comment: '保单号',
+      },
       producerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -52,6 +58,26 @@ module.exports = function getPolicyModel() {
         type: DataTypes.TEXT,
         allowNull: true,
         comment: '业务规则配置(JSON格式)',
+      },
+      effectiveTime: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        comment: '保单生效时间',
+      },
+      expiryTime: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        comment: '保单终止时间',
+      },
+      boundTime: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        comment: '承保时间',
+      },
+      premium: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        comment: '总保费',
       },
     },
     {
