@@ -18,6 +18,22 @@ const error400 = (message, options = {}) =>
   });
 
 /**
+ * 403 错误
+ * @param {string} message 消息
+ * @param {object} options 选项
+ * @returns {AppError} 错误对象
+ */
+const error403 = (message, options = {}) =>
+  new AppError(message || 'Access denied', {
+    code: ErrorCodes.AccessDenied,
+    HTTPStatus: 403,
+    target: options.target || undefined,
+    details: options.details || undefined,
+    innerError: options.innerError || undefined,
+    cause: options.cause || undefined,
+  });
+
+/**
  * 500 错误
  * @param {string} message 消息
  * @param {object} options 选项
@@ -131,6 +147,7 @@ const parseIdCard = (idNo) => {
 
 module.exports = {
   error400,
+  error403,
   error500,
   hasOwnProperty,
   timeCorrectTo,
