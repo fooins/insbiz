@@ -185,6 +185,7 @@ const getPolicyByNo = async (policyNo, options = {}) => {
 
   // 查询保单
   const policy = await Policy.findOne(params);
+  if (!policy) return policy;
 
   // 查询投保人
   if (options.queryApplicants) {
