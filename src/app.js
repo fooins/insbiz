@@ -4,7 +4,11 @@ const rTracer = require('cls-rtracer');
 const router = require('./router');
 const accessLog = require('./libraries/access-log');
 const authenticator = require('./libraries/authenticator');
-const { handleRouteErrors, AppError } = require('./libraries/error-handling');
+const {
+  handleRouteErrors,
+  AppError,
+  ErrorCodes,
+} = require('./libraries/error-handling');
 
 // 实例化一个 Koa 应用
 const app = new Koa();
@@ -58,6 +62,15 @@ app.use(authenticator);
 app.use(router.routes());
 
 // 处理不允许的 HTTP 方法
-app.use(router.allowedMethods());
+app.use(
+  router.allowedMethods({
+    throw: true,
+    methodNotAllowed: () =>
+      new AppError('Method Not Allowed', {
+        code: ErrorCodes.InvalidRequest,
+        HTTPStatus: 405,
+      }),
+  }),
+);
 
 module.exports = app;
