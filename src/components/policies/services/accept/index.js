@@ -330,4 +330,7 @@ const acceptInsurance = async (reqData, profile) => {
 
 module.exports = {
   acceptInsurance,
+  basalValidation,
+  bizValidation,
+  charging,
 };

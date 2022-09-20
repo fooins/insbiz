@@ -1,5 +1,5 @@
 const Router = require('@koa/router');
-const { accept } = require('./services');
+const { accept, quote } = require('./services');
 const { respSucc } = require('../../libraries/response');
 
 // 实例化路由器
@@ -11,6 +11,12 @@ router.post('/policies', async (ctx) => {
     ctx.request.body,
     ctx.profile,
   );
+  respSucc(ctx, responseData);
+});
+
+// 报价
+router.post('/policies/quote', async (ctx) => {
+  const responseData = await quote.quotation(ctx.request.body, ctx.profile);
   respSucc(ctx, responseData);
 });
 
