@@ -118,16 +118,17 @@ const bizValidation = async (ctx, reqData) => {
   delete reqDataBiz.planCode;
 
   // 获取业务规则配置
-  const { accept: bizConfig } = await getBizConfig({
+  const bizConfig = await getBizConfig({
     product,
     plan,
     producer,
     contract,
   });
+  const acceptBizConfig = bizConfig.accept;
   ctx.bizConfig = bizConfig;
 
   // 根据业务规则配置获取对应的校验模式
-  const bizSchema = getBizSchema(bizConfig);
+  const bizSchema = getBizSchema(acceptBizConfig);
 
   // 执行业务规则校验
   const { error, value } = bizSchema.validate(reqDataBiz);
@@ -145,11 +146,14 @@ const bizValidation = async (ctx, reqData) => {
   }
 
   // 根据业务规则调整保单数据
-  adjustPolicyData(ctx, bizConfig);
+  adjustPolicyData(ctx, acceptBizConfig);
 
   // 根据业务规则配置获取对应的校验模式
   // 针对调整后的保单数据
-  const bizSchemaForAdjusted = getBizSchemaForAdjusted(policyData, bizConfig);
+  const bizSchemaForAdjusted = getBizSchemaForAdjusted(
+    policyData,
+    acceptBizConfig,
+  );
 
   // 执行业务规则校验
   // 针对调整后的保单数据
@@ -175,7 +179,7 @@ const bizValidation = async (ctx, reqData) => {
  */
 const charging = async (ctx) => {
   const { bizConfig, policyData } = ctx;
-  const { calculateMode, formula, minimum, maximum } = bizConfig.premium;
+  const { calculateMode, formula, minimum, maximum } = bizConfig.accept.premium;
 
   // 计费
   if (calculateMode === 'formula') {

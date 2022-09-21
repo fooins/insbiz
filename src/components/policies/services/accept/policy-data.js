@@ -4,11 +4,11 @@ const { timeCorrectTo, parseIdCard } = require('../../../../libraries/utils');
 /**
  * 根据业务规则调整保单数据（保障期间）
  * @param {object} ctx 上下文对象
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  */
-const adjustPeriod = (ctx, bizConfig) => {
+const adjustPeriod = (ctx, acceptBizConfig) => {
   const { policyData } = ctx;
-  const { effectiveTime, expiryTime } = bizConfig.period;
+  const { effectiveTime, expiryTime } = acceptBizConfig.period;
   const actionRelativeMap = { before: 'subtract', after: 'add' };
   const now = Date.now();
 
@@ -40,11 +40,11 @@ const adjustPeriod = (ctx, bizConfig) => {
 /**
  * 根据业务规则调整保单数据（保费）
  * @param {object} ctx 上下文对象
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  */
-const adjustPremium = (ctx, bizConfig) => {
+const adjustPremium = (ctx, acceptBizConfig) => {
   const { policyData } = ctx;
-  const { calculateMode, fixed } = bizConfig.premium;
+  const { calculateMode, fixed } = acceptBizConfig.premium;
 
   // 使用固定的值
   if (calculateMode === 'fixed') {
@@ -55,9 +55,9 @@ const adjustPremium = (ctx, bizConfig) => {
 /**
  * 根据业务规则调整保单数据（投保人）
  * @param {object} ctx 上下文对象
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  */
-const adjustApplicants = (ctx, bizConfig) => {
+const adjustApplicants = (ctx, acceptBizConfig) => {
   const { policyData } = ctx;
   const {
     idType,
@@ -67,7 +67,7 @@ const adjustApplicants = (ctx, bizConfig) => {
     contactNo,
     email,
     default: defaultApplicant,
-  } = bizConfig.applicants;
+  } = acceptBizConfig.applicants;
 
   policyData.applicants.forEach((applicant, idx) => {
     const ref = policyData.applicants[idx];
@@ -128,12 +128,12 @@ const adjustApplicants = (ctx, bizConfig) => {
 /**
  * 根据业务规则调整保单数据（被保险人）
  * @param {object} ctx 上下文对象
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  */
-const adjustInsureds = (ctx, bizConfig) => {
+const adjustInsureds = (ctx, acceptBizConfig) => {
   const { policyData } = ctx;
   const { relationship, idType, idNo, gender, birth, contactNo, email } =
-    bizConfig.insureds;
+    acceptBizConfig.insureds;
 
   policyData.insureds.forEach((insured, idx) => {
     const ref = policyData.insureds[idx];
@@ -194,13 +194,13 @@ const adjustInsureds = (ctx, bizConfig) => {
 /**
  * 根据业务规则调整保单数据
  * @param {object} ctx 上下文对象
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  */
-const adjustPolicyData = (ctx, bizConfig) => {
-  adjustPeriod(ctx, bizConfig);
-  adjustPremium(ctx, bizConfig);
-  adjustApplicants(ctx, bizConfig);
-  adjustInsureds(ctx, bizConfig);
+const adjustPolicyData = (ctx, acceptBizConfig) => {
+  adjustPeriod(ctx, acceptBizConfig);
+  adjustPremium(ctx, acceptBizConfig);
+  adjustApplicants(ctx, acceptBizConfig);
+  adjustInsureds(ctx, acceptBizConfig);
 };
 
 module.exports = {
