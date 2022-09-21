@@ -350,11 +350,11 @@ const getInsuredsSchema = (bizConfig) => {
 
 /**
  * 根据业务规则配置获取对应的校验模式
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  * @returns {Joi.ObjectSchema} 校验模式
  */
-const getBizSchema = (bizConfig) => {
-  const { period, premium, applicants, insureds } = bizConfig || {};
+const getBizSchema = (acceptBizConfig) => {
+  const { period, premium, applicants, insureds } = acceptBizConfig || {};
 
   const bizSchema = {
     ...getPeriodSchema(period),
@@ -370,11 +370,11 @@ const getBizSchema = (bizConfig) => {
  * 根据业务规则配置获取对应的校验模式
  * 针对调整后的保单数据
  * @param {object} policyData 保单数据
- * @param {object} bizConfig 业务规则配置
+ * @param {object} acceptBizConfig 业务规则配置（承保部分）
  * @returns {Joi.ObjectSchema} 校验模式
  */
-const getBizSchemaForAdjusted = (policyData, bizConfig) => {
-  const { period, applicants, insureds } = bizConfig || {};
+const getBizSchemaForAdjusted = (policyData, acceptBizConfig) => {
+  const { period, applicants, insureds } = acceptBizConfig || {};
   const bizSchema = {};
 
   // 保单终止时间

@@ -9,6 +9,7 @@ const {
   getInsuredModel,
 } = require('../../models');
 const { getDbConnection } = require('../../libraries/data-access');
+const { error500 } = require('../../libraries/utils');
 
 /**
  * 通过渠道代码获取销售渠道信息
@@ -186,6 +187,15 @@ const getPolicyByNo = async (policyNo, options = {}) => {
   // 查询保单
   const policy = await Policy.findOne(params);
   if (!policy) return policy;
+
+  // 解析业务配置信息
+  if (options.parseBizConfig && policy.bizConfig) {
+    try {
+      policy.bizConfigParsed = JSON.parse(policy.bizConfig);
+    } catch (error) {
+      throw error500('保单数据有误(bizConfig)', { cause: error });
+    }
+  }
 
   // 查询投保人
   if (options.queryApplicants) {
