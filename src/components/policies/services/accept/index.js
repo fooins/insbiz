@@ -9,7 +9,7 @@ const {
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const { getRedis } = require('../../../../libraries/redis');
 const dao = require('../../dao');
-const formulas = require('./formulas');
+const formulas = require('../../../../libraries/formulas');
 const { getBizSchema, getBizSchemaForAdjusted } = require('./biz-schema');
 const { adjustPolicyData } = require('./policy-data');
 
@@ -192,7 +192,7 @@ const charging = async (ctx) => {
       throw error500('计费公式有误');
     }
 
-    formulas[name](ctx, params);
+    formulas[name](ctx, 'accept', params);
   }
 
   // 校验

@@ -48,7 +48,12 @@ const adjustPremium = (ctx, acceptBizConfig) => {
 
   // 使用固定的值
   if (calculateMode === 'fixed') {
-    policyData.premium = parseFloat(fixed);
+    let totalPremium = 0;
+    policyData.insureds.forEach((insureds, idx) => {
+      policyData.insureds[idx].premium = parseFloat(fixed);
+      totalPremium += parseFloat(fixed);
+    });
+    policyData.premium = totalPremium;
   }
 };
 
