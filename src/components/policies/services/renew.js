@@ -172,8 +172,14 @@ const generatePolicyNo = async (ctx) => {
   // 递增续保号
   policyNoSeg[1] = `${parseInt(policyNoSeg[1], 10) + 1}`.padStart(2, '0');
 
-  // 生成保单号和承保时间
+  // 生成保单号
   newPolicyData.policyNo = policyNoSeg.join('/');
+  const exists = await dao.getPolicyByNo(newPolicyData.policyNo, {
+    attributes: ['id'],
+  });
+  if (exists) throw error400('该保单已被续保');
+
+  // 生成承保时间
   newPolicyData.boundTime = moment().toISOString(true);
 };
 
