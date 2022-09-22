@@ -14,11 +14,55 @@ module.exports = {
     effectiveTime: {
       // 是否允许批改
       allowEndorse: true,
+      // 允许的最小值
+      minimum: {
+        // 相对于原值
+        // before:之前 after:之后
+        relative: 'after',
+        // 时间单位
+        // year:年 month:月 day:日 hour:时 minute:分 second:秒
+        unit: 'second',
+        // 数量
+        amount: 1,
+      },
+      // 允许的最大值
+      maximum: {
+        // 相对于原值
+        // before:之前 after:之后
+        relative: 'after',
+        // 时间单位
+        // year:年 month:月 day:日 hour:时 minute:分 second:秒
+        unit: 'day',
+        // 数量
+        amount: 30,
+      },
     },
     // 保单终止时间相关
     expiryTime: {
       // 是否允许批改
       allowEndorse: true,
+      // 允许的最小值
+      minimum: {
+        // 相对于原值
+        // before:之前 after:之后
+        relative: 'before',
+        // 时间单位
+        // year:年 month:月 day:日 hour:时 minute:分 second:秒
+        unit: 'day',
+        // 数量
+        amount: 30,
+      },
+      // 允许的最大值
+      maximum: {
+        // 相对于原值
+        // before:之前 after:之后
+        relative: 'after',
+        // 时间单位
+        // year:年 month:月 day:日 hour:时 minute:分 second:秒
+        unit: 'day',
+        // 数量
+        amount: 30,
+      },
     },
   },
   // 投保人相关

@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const dao = require('../../dao');
+const { getBizSchema } = require('./biz-schema');
 const { error400, error403, error404 } = require('../../../../libraries/utils');
 
 /**
@@ -56,7 +57,32 @@ const getPolicy = async (ctx, reqData, profile) => {
  * @param {object} ctx 上下文对象
  * @param {object} reqData 请求数据
  */
-const bizValidation = async () => {};
+const bizValidation = async (ctx, reqData) => {
+  const { policy } = ctx;
+  const { endorse } = policy.bizConfigParsed;
+
+  // 是否允许批改
+  if (!endorse.allowRenew) throw error400('该保单不允许批改');
+
+  // 根据业务规则配置获取对应的校验模式
+  const bizSchema = getBizSchema(ctx, reqData, endorse);
+
+  // 剔除非业务规则相关的参数
+  const reqDataBiz = { ...reqData };
+  delete reqDataBiz.policyNo;
+
+  // 执行业务规则校验
+  const { error } = bizSchema.validate(reqDataBiz);
+  if (error) {
+    const {
+      details: [{ path }],
+    } = error;
+    throw error400(error.message, {
+      target: path && path[0],
+      cause: error,
+    });
+  }
+};
 
 const generateEndorsementData = async () => {};
 const charging = async () => {};
