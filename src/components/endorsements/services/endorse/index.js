@@ -145,6 +145,10 @@ const generateEndorsementData = async (ctx, reqData) => {
     policyId: policy.id,
     details: [],
   };
+  const newPolicyData = {
+    applicants: [],
+    insureds: [],
+  };
 
   // 批改计划
   if (planCode && planCode !== policy.Plan.code) {
@@ -154,6 +158,7 @@ const generateEndorsementData = async (ctx, reqData) => {
       original: policy.Plan.code,
       current: planCode,
     });
+    newPolicyData.planCode = planCode;
   }
 
   // 批改保单生效时间
@@ -168,6 +173,7 @@ const generateEndorsementData = async (ctx, reqData) => {
       original: policy.effectiveTime,
       current: effectiveTime,
     });
+    newPolicyData.effectiveTime = effectiveTime;
   }
 
   // 批改保单终止时间
@@ -181,12 +187,14 @@ const generateEndorsementData = async (ctx, reqData) => {
       original: policy.expiryTime,
       current: expiryTime,
     });
+    newPolicyData.expiryTime = expiryTime;
   }
 
   // 批改投保人
   applicants.forEach((applicant) => {
     const { no, name, idType, idNo, gender, birth, contactNo, email } =
       applicant;
+    const newApplicantData = { no };
 
     // 原保单对应的投保人
     const oriApplicant = policy.applicants.find((ap) => ap.no === no);
@@ -200,6 +208,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: name,
         targetNo: no,
       });
+      newApplicantData.name = name;
     }
 
     // 批改证件类型
@@ -211,6 +220,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: idType,
         targetNo: no,
       });
+      newApplicantData.idType = idType;
     }
 
     // 批改证件号码
@@ -222,6 +232,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: idNo,
         targetNo: no,
       });
+      newApplicantData.idNo = idNo;
     }
 
     // 批改性别
@@ -233,6 +244,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: gender,
         targetNo: no,
       });
+      newApplicantData.gender = gender;
     }
 
     // 批改出生日期
@@ -247,6 +259,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: birth,
         targetNo: no,
       });
+      newApplicantData.birth = birth;
     }
 
     // 批改联系号码
@@ -258,6 +271,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: contactNo,
         targetNo: no,
       });
+      newApplicantData.contactNo = contactNo;
     }
 
     // 批改电子邮箱地址
@@ -269,7 +283,10 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: email,
         targetNo: no,
       });
+      newApplicantData.email = email;
     }
+
+    newPolicyData.applicants.push(newApplicantData);
   });
 
   // 批改被保险人
@@ -285,6 +302,7 @@ const generateEndorsementData = async (ctx, reqData) => {
       contactNo,
       email,
     } = insured;
+    const newInsuredData = { no };
 
     // 原保单对应的被保险人
     const oriInsured = policy.insureds.find((i) => i.no === no);
@@ -298,6 +316,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: relationship,
         targetNo: no,
       });
+      newInsuredData.relationship = relationship;
     }
 
     // 批改姓名
@@ -309,6 +328,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: name,
         targetNo: no,
       });
+      newInsuredData.name = name;
     }
 
     // 批改证件类型
@@ -320,6 +340,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: idType,
         targetNo: no,
       });
+      newInsuredData.idType = idType;
     }
 
     // 批改证件号码
@@ -331,6 +352,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: idNo,
         targetNo: no,
       });
+      newInsuredData.idNo = idNo;
     }
 
     // 批改性别
@@ -342,6 +364,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: gender,
         targetNo: no,
       });
+      newInsuredData.gender = gender;
     }
 
     // 批改出生日期
@@ -356,6 +379,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: birth,
         targetNo: no,
       });
+      newInsuredData.birth = birth;
     }
 
     // 批改联系号码
@@ -367,6 +391,7 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: contactNo,
         targetNo: no,
       });
+      newInsuredData.contactNo = contactNo;
     }
 
     // 批改电子邮箱地址
@@ -378,10 +403,14 @@ const generateEndorsementData = async (ctx, reqData) => {
         current: email,
         targetNo: no,
       });
+      newInsuredData.email = email;
     }
+
+    newPolicyData.insureds.push(newInsuredData);
   });
 
   ctx.endorsementData = endorsementData;
+  ctx.newPolicyData = newPolicyData;
 };
 
 const charging = async () => {};
