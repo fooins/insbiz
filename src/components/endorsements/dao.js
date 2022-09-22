@@ -97,6 +97,18 @@ const getPolicyByNo = async (policyNo, options = {}) => {
   return policy;
 };
 
+/**
+ * 通过计划代码获取计划信息
+ * @param {string} code 计划代码
+ * @param {number} version 计划版本号（同产品版本号）
+ * @returns {object} 计划信息
+ */
+const getPlanByCode = (code, version) =>
+  getPlanModel().findOne({
+    where: { code, version },
+  });
+
 module.exports = {
   getPolicyByNo,
+  getPlanByCode,
 };
