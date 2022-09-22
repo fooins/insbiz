@@ -3,10 +3,13 @@
 
 const accept = require('./accept');
 const renew = require('./renew');
+const endorse = require('./endorse');
 
 module.exports = {
   // 承保相关
   accept,
   // 续保相关
   renew,
+  // 批改相关
+  endorse,
 };
