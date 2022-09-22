@@ -11,7 +11,7 @@ const validatePolicyNo = (data) => {
   const { error, value } = Joi.object({
     policyNo: Joi.string()
       .max(64)
-      .pattern(/^[a-zA-Z0-9_]*$/)
+      .pattern(/^[a-zA-Z0-9\\-]*$/)
       .required(),
   }).validate(data, {
     allowUnknown: true,

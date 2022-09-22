@@ -165,15 +165,14 @@ const generatePolicyNo = async (ctx) => {
   const { newPolicyData, policy } = ctx;
 
   // 解析原保单号
-  const policyNoSeg = `${policy.policyNo}`.split('/');
+  const policyNoSeg = `${policy.policyNo}`.split('-');
   if (!policyNoSeg[1]) policyNoSeg[1] = '00';
-  if (!policyNoSeg[2]) policyNoSeg[2] = '000';
 
   // 递增续保号
   policyNoSeg[1] = `${parseInt(policyNoSeg[1], 10) + 1}`.padStart(2, '0');
 
   // 生成保单号
-  newPolicyData.policyNo = policyNoSeg.join('/');
+  newPolicyData.policyNo = policyNoSeg.join('-');
   const exists = await dao.getPolicyByNo(newPolicyData.policyNo, {
     attributes: ['id'],
   });
