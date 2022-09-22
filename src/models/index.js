@@ -6,6 +6,8 @@ const getProductModel = require('./product');
 const getPolicyModel = require('./policy');
 const getApplicantModel = require('./applicant');
 const getInsuredModel = require('./insured');
+const getEndorsementModel = require('./endorsement');
+const getEndorsementDetailModel = require('./endorsement-detail');
 
 module.exports = {
   getProducerModel,
@@ -16,4 +18,6 @@ module.exports = {
   getPolicyModel,
   getApplicantModel,
   getInsuredModel,
+  getEndorsementModel,
+  getEndorsementDetailModel,
 };
