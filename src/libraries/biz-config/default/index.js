@@ -5,6 +5,7 @@ const accept = require('./accept');
 const renew = require('./renew');
 const endorse = require('./endorse');
 const cancel = require('./cancel');
+const claim = require('./claim');
 
 module.exports = {
   // 承保相关
@@ -15,4 +16,6 @@ module.exports = {
   endorse,
   // 退保相关
   cancel,
+  // 理赔相关
+  claim,
 };
