@@ -577,7 +577,27 @@ const saveEndorsementData = async (ctx) => {
   ctx.dataSaved = await dao.saveEndorsement(saveData);
 };
 
-const assembleResponseData = async () => {};
+/**
+ * 组装响应数据
+ * @param {object} ctx 上下文对象
+ */
+const assembleResponseData = async (ctx) => {
+  const { dataSaved, policy } = ctx;
+  const { endorsement, endorseDetails } = dataSaved;
+
+  return {
+    policyNo: policy.policyNo,
+    endorseNo: endorsement.endorseNo,
+    difference: endorsement.difference,
+    details: endorseDetails.map((detail) => ({
+      type: detail.type,
+      field: detail.field,
+      original: detail.original,
+      current: detail.current,
+      targetNo: detail.targetNo || undefined,
+    })),
+  };
+};
 
 /**
  * 批改保单
