@@ -160,7 +160,6 @@ const generateEndorsementData = async (ctx) => {
     details: [],
   };
   const newPolicyData = {
-    status: 'canceled',
     applicants: [],
     insureds: [],
   };
