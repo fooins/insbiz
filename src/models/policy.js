@@ -85,6 +85,12 @@ module.exports = function getPolicyModel() {
         allowNull: false,
         comment: '总保费',
       },
+      status: {
+        type: DataTypes.ENUM('valid', 'canceled'),
+        defaultValue: 'valid',
+        allowNull: false,
+        comment: '状态',
+      },
     },
     {
       comment: '保单表',

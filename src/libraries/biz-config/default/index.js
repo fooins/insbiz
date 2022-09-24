@@ -4,6 +4,7 @@
 const accept = require('./accept');
 const renew = require('./renew');
 const endorse = require('./endorse');
+const cancel = require('./cancel');
 
 module.exports = {
   // 承保相关
@@ -12,4 +13,6 @@ module.exports = {
   renew,
   // 批改相关
   endorse,
+  // 退保相关
+  cancel,
 };

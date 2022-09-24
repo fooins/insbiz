@@ -7,6 +7,7 @@ const {
   error403,
   error404,
   error500,
+  hasOwnProperty,
 } = require('../../../libraries/utils');
 
 /**

@@ -324,6 +324,7 @@ Signature = ""
   "expiryTime": "2022-02-22T23:59:59Z",
   "boundTime": "2022-02-02T00:00:00Z",
   "premium": 12.34,
+  "status": "valid",
   "applicants": [
     {
       "no": "f8062bebe66f",
@@ -370,6 +371,7 @@ Signature = ""
 | 10  | `expiryTime`      | UTC 时间                      |  是  | 保单终止时间。 |
 | 11  | `boundTime`       | UTC 时间                      |  是  | 承保时间。     |
 | 12  | `premium`         | 浮点值                        |  是  | 总保费。       |
+| 12  | `status`          | [保单状态](#保单状态枚举-)    |  是  | 总保费。       |
 | 13  | `applicants`      | [投保人](#res-applicants)数组 |  是  | 投保人。       |
 | 14  | `insureds`        | [被保险人](#res-insureds)数组 |  是  | 被保险人。     |
 
@@ -898,3 +900,10 @@ Signature = ""
 |  1  | policy    | 批改保单信息。 |
 |  2  | applicant | 批改投保人。   |
 |  3  | insured   | 批改被保险人。 |
+
+## 保单状态枚举 <!-- omit in toc -->
+
+| 序  | 枚举值   | 说明     |
+| :-: | -------- | -------- |
+|  1  | valid    | 有效。   |
+|  2  | canceled | 已退保。 |

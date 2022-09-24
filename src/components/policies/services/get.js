@@ -71,6 +71,7 @@ const getPolicy = async (reqData, profile) => {
     expiryTime: policy.expiryTime,
     boundTime: policy.boundTime,
     premium: policy.premium,
+    status: policy.status,
     applicants: applicants.map((applicant) => ({
       no: applicant.no,
       name: applicant.name,
