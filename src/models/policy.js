@@ -23,6 +23,12 @@ module.exports = function getPolicyModel() {
         unique: true,
         comment: '保单号',
       },
+      endorseNo: {
+        type: DataTypes.STRING(5),
+        allowNull: false,
+        defaultValue: '000',
+        comment: '批单号',
+      },
       producerId: {
         type: DataTypes.INTEGER,
         allowNull: false,

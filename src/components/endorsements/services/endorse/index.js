@@ -524,8 +524,18 @@ const charging = async (ctx) => {
   });
 };
 
-const generateEndorseNo = async () => {};
-const saveEndorsementData = async () => {};
+/**
+ * 生成批单号
+ * @param {object} ctx 上下文对象
+ */
+const generateEndorseNo = async (ctx) => {
+  const { policy, endorsementData } = ctx;
+  endorsementData.endorseNo = `${parseInt(policy.endorseNo, 10) + 1}`.padStart(
+    3,
+    '0',
+  );
+};
+
 const assembleResponseData = async () => {};
 
 /**
