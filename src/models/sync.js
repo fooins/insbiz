@@ -9,6 +9,9 @@ const {
   getPolicyModel,
   getApplicantModel,
   getInsuredModel,
+  getEndorsementModel,
+  getEndorsementDetailModel,
+  getPolicySnapshootModel,
 } = require('./index');
 
 /**
@@ -29,6 +32,9 @@ module.exports = async function syncModels(options = {}) {
   getPolicyModel();
   getApplicantModel();
   getInsuredModel();
+  getEndorsementModel();
+  getEndorsementDetailModel();
+  getPolicySnapshootModel();
 
   // 将模型同步到数据库（创建对应表）
   await getDbConnection().sync({

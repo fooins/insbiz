@@ -145,6 +145,26 @@ const calPremiumRenew = (ctx, params) => {
 };
 
 /**
+ * 计算保费（批改）
+ * @param {object} ctx 上下文对象
+ * @param {object} params 计算参数
+ */
+const calPremiumEndorse = (ctx, params) => {
+  // 同承保计费
+
+  const context = {
+    ...ctx,
+    policyData: ctx.newPolicy,
+  };
+  calPremiumAccept(context, {
+    cardinal: 0,
+    ...params,
+  });
+
+  ctx.newPolicy = context.policyData;
+};
+
+/**
  * 计算保费
  * @param {object} ctx 上下文对象
  * @param {string} bizType 业务类型
@@ -158,5 +178,9 @@ module.exports = function calculationPremium(ctx, bizType, params = {}) {
   // 续保
   else if (bizType === 'renew') {
     calPremiumRenew(ctx, params);
+  }
+  // 批改
+  else if (bizType === 'endorse') {
+    calPremiumEndorse(ctx, params);
   }
 };

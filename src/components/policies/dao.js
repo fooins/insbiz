@@ -90,7 +90,7 @@ const savePolicy = async (saveData) => {
 
   try {
     // 保存保单
-    const policy = await getPolicyModel().create(saveData);
+    const policy = await getPolicyModel().create(saveData, { transaction: t });
 
     // 保存投保人
     const applicants = await getApplicantModel().bulkCreate(
@@ -98,6 +98,7 @@ const savePolicy = async (saveData) => {
         ...applicant,
         policyId: policy.id,
       })),
+      { transaction: t },
     );
 
     // 保存被保险人
@@ -106,6 +107,7 @@ const savePolicy = async (saveData) => {
         ...insured,
         policyId: policy.id,
       })),
+      { transaction: t },
     );
 
     // 提交事务

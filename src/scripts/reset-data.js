@@ -38,6 +38,9 @@ const resetData = async () => {
     name: '保险产品001',
     code: 'PD001',
     version: 1,
+    bizConfig: JSON.stringify({
+      renew: { allowRenew: true },
+    }),
   });
   // 查询保险产品
   const product = await getProductModel().findOne({
