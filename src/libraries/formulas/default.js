@@ -165,6 +165,49 @@ const calPremiumEndorse = (ctx, params) => {
 };
 
 /**
+ * 计算保费（退保）
+ * @param {object} ctx 上下文对象
+ * @param {object} params 计算参数
+ */
+const calPremiumCancel = (ctx) => {
+  const { policy, newPolicyData } = ctx;
+  const { effectiveTime, expiryTime } = policy;
+
+  // 生效中
+  if (
+    moment(effectiveTime).isBefore(moment()) &&
+    moment(expiryTime).isAfter(moment())
+  ) {
+    // 保单区间（秒数）
+    const duration = moment(expiryTime).diff(moment(effectiveTime), 'second');
+    // 已经生效的区间（秒数）
+    const durationEffective = moment().diff(moment(effectiveTime), 'second');
+
+    let totalPremium = 0;
+    policy.insureds.forEach((insured) => {
+      const premium = (durationEffective * insured.premium) / duration;
+      totalPremium += premium;
+      newPolicyData.insureds.push({
+        no: insured.no,
+        premium,
+      });
+    });
+    newPolicyData.premium = totalPremium;
+  }
+  // 生效前|生效中
+  else {
+    // 全退
+    newPolicyData.premium = 0;
+    policy.insureds.forEach((insured) => {
+      newPolicyData.insureds.push({
+        no: insured.no,
+        premium: 0,
+      });
+    });
+  }
+};
+
+/**
  * 计算保费
  * @param {object} ctx 上下文对象
  * @param {string} bizType 业务类型
@@ -182,5 +225,9 @@ module.exports = function calculationPremium(ctx, bizType, params = {}) {
   // 批改
   else if (bizType === 'endorse') {
     calPremiumEndorse(ctx, params);
+  }
+  // 退保
+  else if (bizType === 'cancel') {
+    calPremiumCancel(ctx, params);
   }
 };
