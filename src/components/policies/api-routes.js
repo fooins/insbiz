@@ -1,5 +1,5 @@
 const Router = require('@koa/router');
-const { accept, quote, get, renew } = require('./services');
+const { accept, quote, get, renew, cancel } = require('./services');
 const { respSucc } = require('../../libraries/response');
 
 // 实例化路由器
@@ -29,6 +29,12 @@ router.get('/policies/:policyNo', async (ctx) => {
 // 续保
 router.post('/policies/renew', async (ctx) => {
   const responseData = await renew.renewPolicy(ctx.request.body, ctx.profile);
+  respSucc(ctx, responseData);
+});
+
+// 退保
+router.delete('/policies/:policyNo', async (ctx) => {
+  const responseData = await cancel.cancellation(ctx.params, ctx.profile);
   respSucc(ctx, responseData);
 });
 

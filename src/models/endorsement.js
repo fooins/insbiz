@@ -23,6 +23,11 @@ module.exports = function getEndorsementModel() {
         unique: 'uni_policy_endorse',
         comment: '批单号',
       },
+      type: {
+        type: DataTypes.ENUM('endorse', 'cancel'),
+        allowNull: false,
+        comment: '类型',
+      },
       difference: {
         type: DataTypes.FLOAT,
         allowNull: false,

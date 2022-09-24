@@ -156,6 +156,7 @@ const generateEndorsementData = async (ctx) => {
 
   const endorsementData = {
     policyId: policy.id,
+    type: 'endorse',
     details: [],
   };
   const newPolicyData = {
