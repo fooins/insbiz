@@ -28,8 +28,11 @@ const logger = require('./libraries/logger')('start', {
     await getDbConnection().authenticate();
     logger.info('数据库连接成功');
 
-    getRedis().on('connect', () => {
-      logger.info('Redis连接成功');
+    await new Promise((resolve) => {
+      getRedis().on('connect', () => {
+        logger.info('Redis连接成功');
+        resolve();
+      });
     });
 
     const addressInfo = await startHttpServer();
