@@ -69,6 +69,8 @@ module.exports = {
   applicants: {
     // 是否允许批改
     allowEndorse: true,
+    // 允许批改的最大投保人数
+    maximum: 10,
     // 姓名相关
     name: {
       // 是否允许批改
@@ -109,6 +111,8 @@ module.exports = {
   insureds: {
     // 是否允许批改
     allowEndorse: true,
+    // 允许批改的最大被保险人数
+    maximum: 10,
     // 与投保人关系相关
     relationship: {
       // 是否允许批改
@@ -166,14 +170,24 @@ module.exports = {
           // 保障天数区间
           ranges: [
             {
-              // 区间开始
+              // 区间开始（包含）
               start: 0,
-              // 区间结束
+              // 区间结束（包含）
               end: 10,
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
               value: 10,
+            },
+            {
+              // 区间开始（包含）
+              start: 11,
+              // 区间结束（包含）
+              end: 365,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 20,
             },
           ],
         },
@@ -182,22 +196,32 @@ module.exports = {
           // 被保险人年龄区间
           ranges: [
             {
-              // 区间开始
+              // 区间开始（包含）
               start: 0,
-              // 区间结束
+              // 区间结束（包含）
               end: 18,
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
               value: 5,
             },
+            {
+              // 区间开始（包含）
+              start: 19,
+              // 区间结束（包含）
+              end: 200,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 15,
+            },
           ],
         },
       },
     },
     // 允许的最小批减费用
-    minimum: 0.0,
+    minimum: -1000.0,
     // 允许的最大批增费用
-    maximum: 9999.0,
+    maximum: 1000.0,
   },
 };

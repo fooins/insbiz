@@ -88,14 +88,24 @@ module.exports = {
           // 保障天数区间
           ranges: [
             {
-              // 区间开始
+              // 区间开始（包含）
               start: 0,
-              // 区间结束
+              // 区间结束（包含）
               end: 10,
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
               value: 10,
+            },
+            {
+              // 区间开始（包含）
+              start: 11,
+              // 区间结束（包含）
+              end: 365,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 20,
             },
           ],
         },
@@ -104,21 +114,31 @@ module.exports = {
           // 被保险人年龄区间
           ranges: [
             {
-              // 区间开始
+              // 区间开始（包含）
               start: 0,
-              // 区间结束
+              // 区间结束（包含）
               end: 18,
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
               value: 5,
             },
+            {
+              // 区间开始（包含）
+              start: 19,
+              // 区间结束（包含）
+              end: 200,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 15,
+            },
           ],
         },
       },
     },
     // 允许的最小值
-    minimum: 0.0,
+    minimum: 0.1,
     // 允许的最大值
     maximum: 9999.0,
   },

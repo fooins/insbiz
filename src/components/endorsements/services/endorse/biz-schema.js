@@ -76,8 +76,17 @@ const getPolicySchema = (ctx, reqData, bizConfig) => {
  * @returns {object} 校验模式（投保人相关）
  */
 const getApplicantsSchema = (ctx, reqData, bizConfig) => {
-  const { allowEndorse, name, idType, idNo, gender, birth, contactNo, email } =
-    bizConfig;
+  const {
+    allowEndorse,
+    maximum,
+    name,
+    idType,
+    idNo,
+    gender,
+    birth,
+    contactNo,
+    email,
+  } = bizConfig;
 
   // 校验模式
   const schema = {};
@@ -122,7 +131,7 @@ const getApplicantsSchema = (ctx, reqData, bizConfig) => {
   }
 
   return {
-    applicants: Joi.array().items(Joi.object(schema)),
+    applicants: Joi.array().items(Joi.object(schema)).max(maximum),
   };
 };
 
@@ -136,6 +145,7 @@ const getApplicantsSchema = (ctx, reqData, bizConfig) => {
 const getInsuredsSchema = (ctx, reqData, bizConfig) => {
   const {
     allowEndorse,
+    maximum,
     relationship,
     name,
     idType,
@@ -199,7 +209,7 @@ const getInsuredsSchema = (ctx, reqData, bizConfig) => {
   }
 
   return {
-    insureds: Joi.array().items(Joi.object(schema)),
+    insureds: Joi.array().items(Joi.object(schema)).max(maximum),
   };
 };
 

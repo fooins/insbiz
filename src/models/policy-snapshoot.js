@@ -16,6 +16,11 @@ module.exports = function getPolicySnapshootModel() {
         allowNull: false,
         comment: '保单ID',
       },
+      endorsementId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: '批单ID',
+      },
       content: {
         type: DataTypes.TEXT,
         allowNull: false,

@@ -81,7 +81,7 @@ const validation = async (ctx, reqData) => {
   delete reqDataBiz.policyNo;
 
   // 执行业务规则校验
-  const { error } = bizSchema.validate(reqDataBiz);
+  const { error, value } = bizSchema.validate(reqDataBiz);
   if (error) {
     const {
       details: [{ path }],
@@ -91,6 +91,7 @@ const validation = async (ctx, reqData) => {
       cause: error,
     });
   }
+  ctx.reqDataValidated = value;
 
   // 检查计划
   if (reqData.planCode) {
@@ -142,11 +143,16 @@ const validation = async (ctx, reqData) => {
 /**
  * 生成批单数据
  * @param {object} ctx 上下文对象
- * @param {object} reqData 请求数据
  */
-const generateEndorsementData = async (ctx, reqData) => {
-  const { policy } = ctx;
-  const { planCode, effectiveTime, expiryTime, applicants, insureds } = reqData;
+const generateEndorsementData = async (ctx) => {
+  const { policy, reqDataValidated } = ctx;
+  const {
+    planCode,
+    effectiveTime,
+    expiryTime,
+    applicants = [],
+    insureds = [],
+  } = reqDataValidated;
 
   const endorsementData = {
     policyId: policy.id,
@@ -177,8 +183,8 @@ const generateEndorsementData = async (ctx, reqData) => {
     endorsementData.details.push({
       type: 'policy',
       field: 'effectiveTime',
-      original: policy.effectiveTime,
-      current: effectiveTime,
+      original: moment(policy.effectiveTime).toISOString(true),
+      current: moment(effectiveTime).toISOString(true),
     });
     newPolicyData.effectiveTime = effectiveTime;
   }
@@ -191,8 +197,8 @@ const generateEndorsementData = async (ctx, reqData) => {
     endorsementData.details.push({
       type: 'policy',
       field: 'expiryTime',
-      original: policy.expiryTime,
-      current: expiryTime,
+      original: moment(policy.expiryTime).toISOString(true),
+      current: moment(expiryTime).toISOString(true),
     });
     newPolicyData.expiryTime = expiryTime;
   }
@@ -262,8 +268,8 @@ const generateEndorsementData = async (ctx, reqData) => {
       endorsementData.details.push({
         type: 'applicant',
         field: 'birth',
-        original: oriApplicant.birth,
-        current: birth,
+        original: moment(oriApplicant.birth).toISOString(true),
+        current: moment(birth).toISOString(true),
         targetNo: no,
       });
       newApplicantData.birth = birth;
@@ -382,8 +388,8 @@ const generateEndorsementData = async (ctx, reqData) => {
       endorsementData.details.push({
         type: 'insured',
         field: 'birth',
-        original: oriInsured.birth,
-        current: birth,
+        original: moment(oriInsured.birth).toISOString(true),
+        current: moment(birth).toISOString(true),
         targetNo: no,
       });
       newInsuredData.birth = birth;
@@ -415,6 +421,14 @@ const generateEndorsementData = async (ctx, reqData) => {
 
     newPolicyData.insureds.push(newInsuredData);
   });
+
+  if (
+    newPolicyData.applicants.length === 0 &&
+    newPolicyData.insureds.length === 0 &&
+    Object.keys(newPolicyData).length === 2
+  ) {
+    throw error400('没有有效的批改项');
+  }
 
   ctx.endorsementData = endorsementData;
   ctx.newPolicyData = newPolicyData;
@@ -472,21 +486,22 @@ const charging = async (ctx) => {
 
   // 校验
   let totalPremium = 0;
+  const difference = newPolicy.premium - policy.premium;
   newPolicy.insureds.forEach((insured) => {
     totalPremium += insured.premium;
   });
   if (totalPremium !== newPolicy.premium) {
-    throw error500(`被保险人总保费不等于保单保费`);
+    throw error500(`计费错误，被保险人总保费不等于保单保费`);
   }
-  if (newPolicy.premium < minimum) {
-    throw error500(`保费不允许小于 ${minimum} 元`);
+  if (difference < minimum) {
+    throw error400(`批减费用不允许小于 ${minimum} 元`);
   }
-  if (newPolicy.premium > maximum) {
-    throw error500(`保费不允许大于 ${maximum} 元`);
+  if (difference > maximum) {
+    throw error400(`批增费用不允许大于 ${maximum} 元`);
   }
 
   // 生成数据
-  endorsementData.difference = newPolicy.premium - policy.premium;
+  endorsementData.difference = difference;
   if (endorsementData.difference !== 0) {
     endorsementData.details.push({
       type: 'policy',
@@ -529,11 +544,37 @@ const charging = async (ctx) => {
  * @param {object} ctx 上下文对象
  */
 const generateEndorseNo = async (ctx) => {
-  const { policy, endorsementData } = ctx;
+  const { policy, newPolicyData, endorsementData } = ctx;
   endorsementData.endorseNo = `${parseInt(policy.endorseNo, 10) + 1}`.padStart(
     3,
     '0',
   );
+  newPolicyData.endorseNo = endorsementData.endorseNo;
+};
+
+/**
+ * 保存数据
+ * @param {object} ctx 上下文对象
+ */
+const saveEndorsementData = async (ctx) => {
+  const { endorsementData, policy, newPolicyData } = ctx;
+
+  // 组装保存的数据
+  const saveData = {
+    endorsementData,
+    newPolicyData,
+    policySnapshootData: {
+      policyId: policy.id,
+      content: JSON.stringify({
+        ...policy.dataValues,
+        applicants: policy.applicants.map((applicant) => applicant.dataValues),
+        insureds: policy.insureds.map((insured) => insured.dataValues),
+      }),
+    },
+  };
+
+  // 保存批单
+  ctx.dataSaved = await dao.saveEndorsement(saveData);
 };
 
 const assembleResponseData = async () => {};
@@ -555,7 +596,7 @@ const endorse = async (reqData, profile) => {
   await validation(ctx, reqData);
 
   // 生成批单数据
-  await generateEndorsementData(ctx, reqData);
+  await generateEndorsementData(ctx);
 
   // 计费
   await charging(ctx);
