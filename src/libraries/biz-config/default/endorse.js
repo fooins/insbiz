@@ -150,4 +150,54 @@ module.exports = {
       allowEndorse: true,
     },
   },
+  // 计费相关
+  premium: {
+    // 计算方式
+    // formula: 使用公式计算
+    calculateMode: 'formula',
+    // 公式
+    formula: {
+      // 名称
+      name: 'default',
+      // 参数
+      params: {
+        // 计费因子：保障天数
+        days: {
+          // 保障天数区间
+          ranges: [
+            {
+              // 区间开始
+              start: 0,
+              // 区间结束
+              end: 10,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 10,
+            },
+          ],
+        },
+        // 计费因子：被保险人年龄
+        insuredAge: {
+          // 被保险人年龄区间
+          ranges: [
+            {
+              // 区间开始
+              start: 0,
+              // 区间结束
+              end: 18,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 5,
+            },
+          ],
+        },
+      },
+    },
+    // 允许的最小批减费用
+    minimum: 0.0,
+    // 允许的最大批增费用
+    maximum: 9999.0,
+  },
 };

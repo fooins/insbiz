@@ -1,8 +1,15 @@
 const Joi = require('joi');
 const moment = require('moment');
 const dao = require('../../dao');
+const formulas = require('../../../../libraries/formulas');
 const { getBizSchema } = require('./biz-schema');
-const { error400, error403, error404 } = require('../../../../libraries/utils');
+const {
+  error400,
+  error403,
+  error404,
+  error500,
+  hasOwnProperty,
+} = require('../../../../libraries/utils');
 
 /**
  * 校验保单号
@@ -413,7 +420,110 @@ const generateEndorsementData = async (ctx, reqData) => {
   ctx.newPolicyData = newPolicyData;
 };
 
-const charging = async () => {};
+/**
+ * 计费
+ * @param {object} ctx 上下文对象
+ */
+const charging = async (ctx) => {
+  const { policy, newPolicyData, endorsementData } = ctx;
+  const { endorse } = policy.bizConfigParsed;
+  const { calculateMode, formula, minimum, maximum } = endorse.premium;
+
+  // 组装完整的新保单数据
+  const newPolicy = {
+    ...policy.dataValues,
+    ...newPolicyData,
+    applicants: [],
+    insureds: [],
+  };
+  policy.applicants.forEach((applicant) => {
+    newPolicy.applicants.push({
+      ...applicant.dataValues,
+      ...newPolicyData.applicants.find((a) => a.no === applicant.no),
+    });
+  });
+  policy.insureds.forEach((insured) => {
+    newPolicy.insureds.push({
+      ...insured.dataValues,
+      ...newPolicyData.insureds.find((i) => i.no === insured.no),
+    });
+  });
+
+  // 计费
+  if (calculateMode === 'formula') {
+    const { name, params } = formula;
+
+    if (
+      !hasOwnProperty(formulas, name) ||
+      typeof formulas[name] !== 'function'
+    ) {
+      throw error500('计费公式有误');
+    }
+
+    formulas[name](
+      {
+        ...ctx,
+        newPolicy,
+      },
+      'endorse',
+      params,
+    );
+  }
+
+  // 校验
+  let totalPremium = 0;
+  newPolicy.insureds.forEach((insured) => {
+    totalPremium += insured.premium;
+  });
+  if (totalPremium !== newPolicy.premium) {
+    throw error500(`被保险人总保费不等于保单保费`);
+  }
+  if (newPolicy.premium < minimum) {
+    throw error500(`保费不允许小于 ${minimum} 元`);
+  }
+  if (newPolicy.premium > maximum) {
+    throw error500(`保费不允许大于 ${maximum} 元`);
+  }
+
+  // 生成数据
+  endorsementData.difference = newPolicy.premium - policy.premium;
+  if (endorsementData.difference !== 0) {
+    endorsementData.details.push({
+      type: 'policy',
+      field: 'premium',
+      original: policy.premium,
+      current: newPolicy.premium,
+    });
+    newPolicyData.premium = newPolicy.premium;
+  }
+  newPolicy.insureds.forEach((insured) => {
+    const oriInsured = policy.insureds.find((i) => i.no === insured.no);
+    if (insured.premium !== oriInsured.premium) {
+      let exists = false;
+      newPolicyData.insureds.forEach((newData, idx) => {
+        if (insured.no === newData.no) {
+          exists = true;
+          newPolicyData.insureds[idx].premium = insured.premium;
+        }
+      });
+      if (!exists) {
+        newPolicyData.insureds.push({
+          no: insured.no,
+          premium: insured.premium,
+        });
+      }
+
+      endorsementData.details.push({
+        type: 'insured',
+        field: 'premium',
+        original: oriInsured.premium,
+        current: insured.premium,
+        targetNo: insured.no,
+      });
+    }
+  });
+};
+
 const generateEndorseNo = async () => {};
 const saveEndorsementData = async () => {};
 const assembleResponseData = async () => {};
