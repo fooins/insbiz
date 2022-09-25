@@ -1,3 +1,3 @@
 module.exports = async () => {
-  console.log('auto-claim');
+  console.log('auto-claim', Date.now());
 };

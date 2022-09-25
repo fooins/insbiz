@@ -5,6 +5,7 @@ const {
   getContractModel,
   getPlanModel,
   getProductModel,
+  getJobModel,
 } = require('../models');
 const { aesEncrypt } = require('../libraries/crypto');
 
@@ -63,6 +64,17 @@ const resetData = async () => {
     productId: product.id,
     productVersion: product.version,
   });
+
+  // 创建作业
+  await getJobModel().bulkCreate([
+    {
+      name: 'autoClaim',
+      description: '执行自动理赔',
+      status: 'enable',
+      script: 'autoClaim',
+      cron: '*/10 * * * * *',
+    },
+  ]);
 };
 
 resetData()
