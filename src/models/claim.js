@@ -22,6 +22,11 @@ module.exports = function getClaimModel() {
         unique: true,
         comment: '理赔单号',
       },
+      sumInsured: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        comment: '总保额',
+      },
       status: {
         type: DataTypes.ENUM('pending', 'handing', 'declined', 'confirmed'),
         defaultValue: 'pending',

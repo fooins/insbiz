@@ -62,6 +62,11 @@ module.exports = function getClaimInsuredModel() {
         allowNull: true,
         comment: '电子邮箱地址',
       },
+      sumInsured: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        comment: '保额',
+      },
     },
     {
       comment: '理赔单被保险人表',
