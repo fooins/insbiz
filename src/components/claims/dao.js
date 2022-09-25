@@ -141,7 +141,51 @@ const saveClaims = async (saveData) => {
   }
 };
 
+/**
+ * 通过理赔单号获取理赔单信息
+ * @param {string} claimNo 理赔单号
+ * @param {object} options 选项
+ * @returns {object} 理赔单信息
+ */
+const getClaimByNo = async (claimNo, options = {}) => {
+  const Claim = getClaimModel();
+  const params = {
+    where: { claimNo },
+    include: [],
+  };
+  if (options.attributes) params.attributes = options.attributes;
+
+  // 查询保单
+  if (options.includePolicy) {
+    const Policy = getPolicyModel();
+    Claim.belongsTo(Policy);
+
+    const include = {
+      model: Policy,
+    };
+    if (options.includePolicy.attributes) {
+      include.attributes = options.includePolicy.attributes;
+    }
+
+    params.include.push(include);
+  }
+
+  // 查询理赔单
+  const claim = await Claim.findOne(params);
+  if (!claim) return claim;
+
+  // 查询被保险人
+  if (options.queryInsureds) {
+    claim.insureds = await getClaimInsuredModel().findAll({
+      where: { claimId: claim.id },
+    });
+  }
+
+  return claim;
+};
+
 module.exports = {
   getPolicyByNo,
   saveClaims,
+  getClaimByNo,
 };
