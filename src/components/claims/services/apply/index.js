@@ -79,6 +79,13 @@ const validation = async (ctx, reqData) => {
   const { policy } = ctx;
   const { claim } = policy.bizConfigParsed;
 
+  // 是否存在待处理的理赔单
+  const pendingClaim = dao.queryClaim({
+    attributes: ['id'],
+    where: { policyId: policy.id, status: 'pending' },
+  });
+  if (pendingClaim) throw error400('该保单已存在待处理的理赔单');
+
   // 根据业务规则配置获取对应的校验模式
   const bizSchema = getBizSchema(ctx, claim);
 

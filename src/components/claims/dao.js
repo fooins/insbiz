@@ -184,8 +184,16 @@ const getClaimByNo = async (claimNo, options = {}) => {
   return claim;
 };
 
+/**
+ * 查询理赔单
+ * @param {object} params 选项
+ * @returns {array} 理赔单列表
+ */
+const queryClaim = async (params = {}) => getClaimModel().findOne(params);
+
 module.exports = {
   getPolicyByNo,
   saveClaims,
   getClaimByNo,
+  queryClaim,
 };
