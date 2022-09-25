@@ -237,7 +237,7 @@ const assembleResponseData = async (ctx) => {
  * @param {object} profile 身份信息
  * @returns {object} 响应的数据
  */
-const claim = async (reqData, profile) => {
+const applyClaims = async (reqData, profile) => {
   // 定义一个上下文变量
   const ctx = {};
 
@@ -266,5 +266,5 @@ const claim = async (reqData, profile) => {
 };
 
 module.exports = {
-  claim,
+  applyClaims,
 };

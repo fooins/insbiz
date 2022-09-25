@@ -1,5 +1,7 @@
-const claim = require('./claim');
+const apply = require('./apply');
+const get = require('./get');
 
 module.exports = {
-  claim,
+  apply,
+  get,
 };
