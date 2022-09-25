@@ -12,6 +12,8 @@ const {
   getEndorsementModel,
   getEndorsementDetailModel,
   getPolicySnapshootModel,
+  getClaimModel,
+  getClaimInsuredModel,
 } = require('./index');
 
 /**
@@ -35,6 +37,8 @@ module.exports = async function syncModels(options = {}) {
   getEndorsementModel();
   getEndorsementDetailModel();
   getPolicySnapshootModel();
+  getClaimModel();
+  getClaimInsuredModel();
 
   // 将模型同步到数据库（创建对应表）
   await getDbConnection().sync({

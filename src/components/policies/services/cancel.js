@@ -7,6 +7,7 @@ const {
   error403,
   error404,
   error500,
+  hasOwnProperty,
 } = require('../../../libraries/utils');
 
 /**
@@ -28,6 +29,9 @@ const getPolicy = async (ctx, reqData, profile) => {
   });
   if (!policy) throw error404('保单不存在');
   if (policy.producerId !== producer.id) throw error403();
+  if (['canceled'].includes(policy.status)) {
+    throw error400('保单当前状态不允许退保');
+  }
 
   ctx.policy = policy;
 };
@@ -72,6 +76,7 @@ const generateEndorsementData = async (ctx) => {
     details: [],
   };
   const newPolicyData = {
+    status: 'canceled',
     applicants: [],
     insureds: [],
   };

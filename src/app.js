@@ -38,7 +38,7 @@ app.use(
       if (error.type === 'entity.too.large') {
         throw new AppError('请求的大小超出最大限制。', {
           HTTPStatus: 413,
-          code: 'InvalidRequest',
+          code: ErrorCodes.InvalidRequest,
           cause: error,
         });
       } else {
@@ -46,8 +46,8 @@ app.use(
           HTTPStatus: error.status || 500,
           code:
             error.status && `${error.status}`.substring(0, 1) === '4'
-              ? 'InvalidRequest'
-              : 'GeneralException',
+              ? ErrorCodes.InvalidRequest
+              : ErrorCodes.GeneralException,
           cause: error,
         });
       }

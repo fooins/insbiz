@@ -324,6 +324,7 @@ Signature = ""
   "expiryTime": "2022-02-22T23:59:59Z",
   "boundTime": "2022-02-02T00:00:00Z",
   "premium": 12.34,
+  "status": "valid",
   "applicants": [
     {
       "no": "f8062bebe66f",
@@ -370,6 +371,7 @@ Signature = ""
 | 10  | `expiryTime`      | UTC 时间                      |  是  | 保单终止时间。 |
 | 11  | `boundTime`       | UTC 时间                      |  是  | 承保时间。     |
 | 12  | `premium`         | 浮点值                        |  是  | 总保费。       |
+| 12  | `status`          | [保单状态](#保单状态枚举-)    |  是  | 总保费。       |
 | 13  | `applicants`      | [投保人](#res-applicants)数组 |  是  | 投保人。       |
 | 14  | `insureds`        | [被保险人](#res-insureds)数组 |  是  | 被保险人。     |
 
@@ -716,14 +718,15 @@ Signature = ""
 
 | 序  | 参数名         | 类型                               |      必需      | 说明           |
 | :-: | -------------- | ---------------------------------- | :------------: | -------------- |
-|  1  | `relationship` | [与投保人关系](#与投保人关系枚举-) | [?](#required) | 与投保人关系。 |
-|  2  | `name`         | 字符串                             | [?](#required) | 姓名。         |
-|  3  | `idType`       | [证件类型](#证件类型枚举-)         | [?](#required) | 证件类型。     |
-|  4  | `idNo`         | 字符串                             | [?](#required) | 证件号码。     |
-|  5  | `gender`       | [性别](#性别枚举-)                 | [?](#required) | 性别。         |
-|  6  | `birth`        | UTC 时间                           | [?](#required) | 出生日期。     |
-|  7  | `contactNo`    | 字符串                             | [?](#required) | 联系号码。     |
-|  8  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。 |
+|  1  | `no`           | 字符串                             | [?](#required) | 编号。         |
+|  2  | `relationship` | [与投保人关系](#与投保人关系枚举-) | [?](#required) | 与投保人关系。 |
+|  3  | `name`         | 字符串                             | [?](#required) | 姓名。         |
+|  4  | `idType`       | [证件类型](#证件类型枚举-)         | [?](#required) | 证件类型。     |
+|  5  | `idNo`         | 字符串                             | [?](#required) | 证件号码。     |
+|  6  | `gender`       | [性别](#性别枚举-)                 | [?](#required) | 性别。         |
+|  7  | `birth`        | UTC 时间                           | [?](#required) | 出生日期。     |
+|  8  | `contactNo`    | 字符串                             | [?](#required) | 联系号码。     |
+|  9  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。 |
 
 ### 4.1.2. 响应数据 <!-- omit in toc -->
 
@@ -898,3 +901,10 @@ Signature = ""
 |  1  | policy    | 批改保单信息。 |
 |  2  | applicant | 批改投保人。   |
 |  3  | insured   | 批改被保险人。 |
+
+## 保单状态枚举 <!-- omit in toc -->
+
+| 序  | 枚举值   | 说明     |
+| :-: | -------- | -------- |
+|  1  | valid    | 有效。   |
+|  2  | canceled | 已退保。 |
