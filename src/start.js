@@ -1,5 +1,6 @@
 const winston = require('winston');
 const { startHttpServer } = require('./server');
+const { scheduleJob } = require('./scheduler');
 const { validateConfigs } = require('./libraries/configuration');
 const { getDbConnection } = require('./libraries/data-access');
 const { getRedis } = require('./libraries/redis');
@@ -37,6 +38,11 @@ const logger = require('./libraries/logger')('start', {
 
     const addressInfo = await startHttpServer();
     logger.info('HTTP服务启动成功', { addressInfo });
+
+    if (process.env.INSBIZ_JOB) {
+      await scheduleJob();
+      logger.info('作业调度成功');
+    }
   } catch (error) {
     handleError(
       new AppError(error.message, {

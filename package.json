@@ -4,7 +4,7 @@
   "description": "这是一个在福保成立初期设计开发的保险业务系统，它为前端销售渠道提供保险业务的接入，包括但不限于承保、退保、批改、查询保单、理赔、续保等服务。纯 API 接入没有界面。",
   "main": "src/start.js",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon ./src/start.js",
+    "start:dev": "cross-env NODE_ENV=development INSBIZ_JOB=1 nodemon ./src/start.js",
     "lint": "eslint ./src --fix",
     "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
     "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
@@ -35,6 +35,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
+    "node-schedule": "^2.1.0",
     "sequelize": "^6.21.4",
     "uuid": "^9.0.0",
     "winston": "^3.8.1",
