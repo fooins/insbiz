@@ -11,6 +11,7 @@ const getEndorsementDetailModel = require('./endorsement-detail');
 const getPolicySnapshootModel = require('./policy-snapshoot');
 const getClaimModel = require('./claim');
 const getClaimInsuredModel = require('./claim-insured');
+const getJobModel = require('./job');
 
 module.exports = {
   getProducerModel,
@@ -26,4 +27,5 @@ module.exports = {
   getPolicySnapshootModel,
   getClaimModel,
   getClaimInsuredModel,
+  getJobModel,
 };

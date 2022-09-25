@@ -79,6 +79,13 @@ const validation = async (ctx, reqData) => {
   const { policy } = ctx;
   const { claim } = policy.bizConfigParsed;
 
+  // 是否存在待处理的理赔单
+  const pendingClaim = dao.queryClaim({
+    attributes: ['id'],
+    where: { policyId: policy.id, status: 'pending' },
+  });
+  if (pendingClaim) throw error400('该保单已存在待处理的理赔单');
+
   // 根据业务规则配置获取对应的校验模式
   const bizSchema = getBizSchema(ctx, claim);
 
@@ -128,12 +135,15 @@ const validation = async (ctx, reqData) => {
 /**
  * 生成理赔单数据
  * @param {object} ctx 上下文对象
+ * @param {object} profile 身份数据
  */
-const generateClaimData = async (ctx) => {
+const generateClaimData = async (ctx, profile) => {
   const { policy, reqDataValidated } = ctx;
+  const { producer } = profile;
 
   const claimData = {
     policyId: policy.id,
+    producerId: producer.id,
     insureds: reqDataValidated.insureds,
   };
 
@@ -237,7 +247,7 @@ const assembleResponseData = async (ctx) => {
  * @param {object} profile 身份信息
  * @returns {object} 响应的数据
  */
-const claim = async (reqData, profile) => {
+const applyClaims = async (reqData, profile) => {
   // 定义一个上下文变量
   const ctx = {};
 
@@ -248,7 +258,7 @@ const claim = async (reqData, profile) => {
   await validation(ctx, reqData);
 
   // 生成理赔单数据
-  await generateClaimData(ctx);
+  await generateClaimData(ctx, profile);
 
   // 计算赔付金额
   await charging(ctx);
@@ -266,5 +276,5 @@ const claim = async (reqData, profile) => {
 };
 
 module.exports = {
-  claim,
+  applyClaims,
 };

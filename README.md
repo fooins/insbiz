@@ -27,12 +27,13 @@
 │  │  ├─ logger.js  // 日志工具
 │  │  └─ ...  // 更多工具
 │  │
+│  ├─ jobs  // 作业（定时任务）目录
 │  ├─ models  // 数据库表模型目录
-│  │
 │  ├─ scripts  // NPM 脚本目录
 │  │
 │  ├─ app.js  // 程序主应用实现
 │  ├─ router.js  // HTTP 路由实现
+│  ├─ scheduler.js  // 作业调度器
 │  ├─ server.js  // HTTP 服务实现
 │  └─ start.js  // 程序启动入口
 │
