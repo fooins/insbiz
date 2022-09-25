@@ -128,12 +128,15 @@ const validation = async (ctx, reqData) => {
 /**
  * 生成理赔单数据
  * @param {object} ctx 上下文对象
+ * @param {object} profile 身份数据
  */
-const generateClaimData = async (ctx) => {
+const generateClaimData = async (ctx, profile) => {
   const { policy, reqDataValidated } = ctx;
+  const { producer } = profile;
 
   const claimData = {
     policyId: policy.id,
+    producerId: producer.id,
     insureds: reqDataValidated.insureds,
   };
 
@@ -248,7 +251,7 @@ const applyClaims = async (reqData, profile) => {
   await validation(ctx, reqData);
 
   // 生成理赔单数据
-  await generateClaimData(ctx);
+  await generateClaimData(ctx, profile);
 
   // 计算赔付金额
   await charging(ctx);

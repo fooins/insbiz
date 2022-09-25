@@ -22,6 +22,11 @@ module.exports = function getClaimModel() {
         unique: true,
         comment: '理赔单号',
       },
+      producerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: '所属渠道ID',
+      },
       sumInsured: {
         type: DataTypes.FLOAT,
         allowNull: false,

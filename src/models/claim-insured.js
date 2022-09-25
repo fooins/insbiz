@@ -19,7 +19,6 @@ module.exports = function getClaimInsuredModel() {
       no: {
         type: DataTypes.STRING(36),
         allowNull: false,
-        unique: true,
         comment: '编号',
       },
       relationship: {
