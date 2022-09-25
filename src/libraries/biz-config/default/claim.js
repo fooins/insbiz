@@ -2,14 +2,46 @@ module.exports = {
   // 计费相关
   premium: {
     // 计算方式
+    // fixed: 固定值
     // formula: 使用公式计算
     calculateMode: 'formula',
+    // 固定值
+    fixed: 0.0,
     // 公式
     formula: {
       // 名称
       name: 'default',
       // 参数
-      params: {},
+      params: {
+        // 基数
+        cardinal: 0,
+        // 计费因子：被保险人年龄
+        insuredAge: {
+          // 被保险人年龄区间
+          ranges: [
+            {
+              // 区间开始（包含）
+              start: 0,
+              // 区间结束（包含）
+              end: 18,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 100000,
+            },
+            {
+              // 区间开始（包含）
+              start: 19,
+              // 区间结束（包含）
+              end: 200,
+              // 操作符 (加:add 减:subtract 乘:multiply)
+              operator: 'add',
+              // 值
+              value: 50000,
+            },
+          ],
+        },
+      },
     },
   },
   // 被保险人相关

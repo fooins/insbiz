@@ -47,7 +47,7 @@ const calPremiumAccept = (ctx, params) => {
       const age = Math.abs(moment(effectiveTime).diff(birth, 'days'));
 
       // 遍历区间
-      days.ranges.forEach((range) => {
+      insuredAge.ranges.forEach((range) => {
         const { start, end, operator, value } = range;
         if (age >= start && age <= end) {
           if (operator === 'add') {
@@ -119,7 +119,7 @@ const calPremiumRenew = (ctx, params) => {
       const age = Math.abs(moment(effectiveTime).diff(birth, 'days'));
 
       // 遍历区间
-      days.ranges.forEach((range) => {
+      insuredAge.ranges.forEach((range) => {
         const { start, end, operator, value } = range;
         if (age >= start && age <= end) {
           if (operator === 'add') {
@@ -208,6 +208,56 @@ const calPremiumCancel = (ctx) => {
 };
 
 /**
+ * 计算理赔赔付金额
+ * @param {object} ctx 上下文对象
+ * @param {object} params 计算参数
+ */
+const calPremiumClaim = (ctx, params) => {
+  const { policy, claimData } = ctx;
+  const { cardinal, insuredAge } = params;
+
+  // 循环处理每个被保险人
+  let totalSumInsured = 0;
+  claimData.insureds.forEach((insured, idx) => {
+    // 保单中对应的被保险人
+    const policyInsured = policy.insureds.find((i) => i.no === insured.no);
+    // 保额
+    let sumInsured = cardinal;
+
+    // 根据被保险人年龄计费
+    if (insuredAge) {
+      // 计算被保险人年龄
+      const { effectiveTime } = policy;
+      const { birth } = policyInsured;
+      const age = Math.abs(moment(effectiveTime).diff(birth, 'days'));
+
+      // 遍历区间
+      insuredAge.ranges.forEach((range) => {
+        const { start, end, operator, value } = range;
+        if (age >= start && age <= end) {
+          if (operator === 'add') {
+            sumInsured += value;
+          } else if (operator === 'subtract') {
+            sumInsured -= value;
+          } else if (operator === 'multiply') {
+            sumInsured *= value;
+          }
+        }
+      });
+    }
+
+    // 设置被保险人保额
+    claimData.insureds[idx].sumInsured = sumInsured;
+
+    // 累计总保额
+    totalSumInsured += sumInsured;
+  });
+
+  // 设置总保额
+  claimData.sumInsured = totalSumInsured;
+};
+
+/**
  * 计算保费
  * @param {object} ctx 上下文对象
  * @param {string} bizType 业务类型
@@ -229,5 +279,9 @@ module.exports = function calculationPremium(ctx, bizType, params = {}) {
   // 退保
   else if (bizType === 'cancel') {
     calPremiumCancel(ctx, params);
+  }
+  // 理赔
+  else if (bizType === 'claim') {
+    calPremiumClaim(ctx, params);
   }
 };

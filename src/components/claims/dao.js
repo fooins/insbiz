@@ -5,8 +5,11 @@ const {
   getPlanModel,
   getApplicantModel,
   getInsuredModel,
+  getClaimModel,
+  getClaimInsuredModel,
 } = require('../../models');
 const { error500 } = require('../../libraries/utils');
+const { getDbConnection } = require('../../libraries/data-access');
 
 /**
  * 通过保单号获取保单信息
@@ -97,6 +100,48 @@ const getPolicyByNo = async (policyNo, options = {}) => {
   return policy;
 };
 
+/**
+ * 保存理赔单
+ * @param {object} saveData 需要保存的数据
+ */
+const saveClaims = async (saveData) => {
+  // 创建事务
+  const t = await getDbConnection().transaction();
+
+  try {
+    const { claimData } = saveData;
+
+    // 生成理赔单
+    const claim = await getClaimModel().create(claimData, {
+      transaction: t,
+    });
+
+    // 生成理赔单被保险人
+    const claimInsureds = await getClaimInsuredModel().bulkCreate(
+      claimData.insureds.map((insured) => ({
+        ...insured,
+        claimId: claim.id,
+      })),
+      { transaction: t },
+    );
+
+    // 提交事务
+    await t.commit();
+
+    return {
+      claim,
+      claimInsureds,
+    };
+  } catch (error) {
+    // 回滚事务
+    await t.rollback();
+
+    // 抛出错误
+    throw error;
+  }
+};
+
 module.exports = {
   getPolicyByNo,
+  saveClaims,
 };
