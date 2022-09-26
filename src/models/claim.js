@@ -38,6 +38,11 @@ module.exports = function getClaimModel() {
         allowNull: false,
         comment: '状态',
       },
+      bizConfig: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '业务规则配置(JSON格式)',
+      },
     },
     {
       comment: '理赔单表',

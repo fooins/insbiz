@@ -98,4 +98,13 @@ module.exports = {
       required: true,
     },
   },
+  // 自动理赔相关
+  autoClaim: {
+    // 是否开启自动理赔
+    enable: false,
+    // 允许的最大保额
+    maximum: 100.0,
+    // 赔偿器
+    compensator: 'default',
+  },
 };

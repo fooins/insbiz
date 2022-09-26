@@ -139,11 +139,13 @@ const validation = async (ctx, reqData) => {
  */
 const generateClaimData = async (ctx, profile) => {
   const { policy, reqDataValidated } = ctx;
+  const { claim } = policy.bizConfigParsed;
   const { producer } = profile;
 
   const claimData = {
     policyId: policy.id,
     producerId: producer.id,
+    bizConfig: JSON.stringify(claim),
     insureds: reqDataValidated.insureds,
   };
 
