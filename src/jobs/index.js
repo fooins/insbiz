@@ -1,5 +1,5 @@
-const autoClaim = require('./auto-claim');
+const autoCompensate = require('./auto-compensate');
 
 module.exports = {
-  autoClaim,
+  autoCompensate,
 };
