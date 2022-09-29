@@ -41,7 +41,7 @@ const resetData = async () => {
     version: 1,
     bizConfig: JSON.stringify({
       renew: { allowRenew: true },
-      claim: { enable: true },
+      claim: { autoCompensate: { enable: true } },
     }),
   });
   // 查询保险产品

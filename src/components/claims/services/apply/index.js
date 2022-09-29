@@ -80,7 +80,7 @@ const validation = async (ctx, reqData) => {
   const { claim } = policy.bizConfigParsed;
 
   // 是否存在待处理的理赔单
-  const pendingClaim = dao.queryClaim({
+  const pendingClaim = await dao.queryClaim({
     attributes: ['id'],
     where: { policyId: policy.id, status: 'pending' },
   });
