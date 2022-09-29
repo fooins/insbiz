@@ -140,6 +140,7 @@ const validation = async (ctx, reqData) => {
 const generateClaimData = async (ctx, profile) => {
   const { policy, reqDataValidated } = ctx;
   const { claim } = policy.bizConfigParsed;
+  const { autoCompensate } = claim;
   const { producer } = profile;
 
   const claimData = {
@@ -149,7 +150,15 @@ const generateClaimData = async (ctx, profile) => {
     insureds: reqDataValidated.insureds,
   };
 
+  let compensationTaskData = null;
+  if (autoCompensate.enable) {
+    compensationTaskData = {
+      autoCompensate: true,
+    };
+  }
+
   ctx.claimData = claimData;
+  ctx.compensationTaskData = compensationTaskData;
 };
 
 /**
@@ -206,11 +215,12 @@ const generateClaimNo = async (ctx) => {
  * @param {object} ctx 上下文对象
  */
 const saveClaimData = async (ctx) => {
-  const { claimData } = ctx;
+  const { claimData, compensationTaskData } = ctx;
 
   // 组装保存的数据
   const saveData = {
     claimData,
+    compensationTaskData,
   };
 
   // 保存理赔单

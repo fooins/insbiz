@@ -7,6 +7,7 @@ const {
   getInsuredModel,
   getClaimModel,
   getClaimInsuredModel,
+  getCompensationTaskModel,
 } = require('../../models');
 const { error500 } = require('../../libraries/utils');
 const { getDbConnection } = require('../../libraries/data-access');
@@ -109,7 +110,7 @@ const saveClaims = async (saveData) => {
   const t = await getDbConnection().transaction();
 
   try {
-    const { claimData } = saveData;
+    const { claimData, compensationTaskData } = saveData;
 
     // 生成理赔单
     const claim = await getClaimModel().create(claimData, {
@@ -124,6 +125,19 @@ const saveClaims = async (saveData) => {
       })),
       { transaction: t },
     );
+
+    // 生成赔付任务
+    if (compensationTaskData) {
+      await getCompensationTaskModel().create(
+        {
+          ...compensationTaskData,
+          claimId: claim.id,
+        },
+        {
+          transaction: t,
+        },
+      );
+    }
 
     // 提交事务
     await t.commit();
