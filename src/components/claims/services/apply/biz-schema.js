@@ -7,17 +7,7 @@ const Joi = require('joi');
  * @returns {object} 校验模式（被保险人相关）
  */
 const getInsuredsSchema = (ctx, bizConfig) => {
-  const {
-    no,
-    relationship,
-    name,
-    idType,
-    idNo,
-    gender,
-    birth,
-    contactNo,
-    email,
-  } = bizConfig;
+  const { no, relationship, name, idType, idNo, gender, birth } = bizConfig;
   const { policy } = ctx;
   const { insureds } = policy;
 
@@ -31,12 +21,7 @@ const getInsuredsSchema = (ctx, bizConfig) => {
   }
 
   // 与投保人关系相关
-  schema.relationship = Joi.string().allow(
-    'self',
-    'parents',
-    'brothers',
-    'sisters',
-  );
+  schema.relationship = Joi.string();
   if (relationship.required) {
     schema.relationship = schema.relationship.required();
   }
@@ -48,7 +33,7 @@ const getInsuredsSchema = (ctx, bizConfig) => {
   }
 
   // 证件类型相关
-  schema.idType = Joi.string().allow('idcard', 'passport');
+  schema.idType = Joi.string();
   if (idType.required) {
     schema.idType = schema.idType.required();
   }
@@ -60,7 +45,7 @@ const getInsuredsSchema = (ctx, bizConfig) => {
   }
 
   // 性别相关
-  schema.gender = Joi.string().allow('man', 'female', 'other', 'unknown');
+  schema.gender = Joi.string();
   if (gender.required) {
     schema.gender = schema.gender.required();
   }
@@ -71,23 +56,8 @@ const getInsuredsSchema = (ctx, bizConfig) => {
     schema.birth = schema.birth.required();
   }
 
-  // 联系号码相关
-  schema.contactNo = Joi.string();
-  if (contactNo.required) {
-    schema.contactNo = schema.contactNo.required();
-  }
-
-  // 电子邮箱地址
-  schema.email = Joi.string().email();
-  if (email.required) {
-    schema.email = schema.email.required();
-  }
-
   return {
-    insureds: Joi.array()
-      .items(Joi.object(schema).or('no', 'idType').or('no', 'idNo'))
-      .max(insureds.length)
-      .min(1),
+    insureds: Joi.array().items(Joi.object(schema)).max(insureds.length).min(1),
   };
 };
 

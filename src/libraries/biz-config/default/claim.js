@@ -55,8 +55,6 @@ module.exports = {
     relationship: {
       // 是否必须
       required: true,
-      // 允许的值
-      options: ['self', 'parents', 'brothers', 'sisters'],
     },
     // 姓名
     name: {
@@ -67,8 +65,6 @@ module.exports = {
     idType: {
       // 是否必须
       required: true,
-      // 允许的值
-      options: ['idcard', 'passport'],
     },
     // 证件号码
     idNo: {
@@ -79,21 +75,9 @@ module.exports = {
     gender: {
       // 是否必须
       required: true,
-      // 允许的值
-      options: ['man', 'female', 'other', 'unknown'],
     },
     // 出生日期
     birth: {
-      // 是否必须
-      required: true,
-    },
-    // 联系号码
-    contactNo: {
-      // 是否必须
-      required: true,
-    },
-    // 电子邮箱地址
-    email: {
       // 是否必须
       required: true,
     },
