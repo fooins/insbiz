@@ -29,7 +29,7 @@ module.exports = function getClaimModel() {
       },
       sumInsured: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
         comment: '总保额',
       },
       status: {
