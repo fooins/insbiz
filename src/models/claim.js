@@ -33,7 +33,7 @@ module.exports = function getClaimModel() {
         comment: '总保额',
       },
       status: {
-        type: DataTypes.ENUM('pending', 'handing', 'declined', 'confirmed'),
+        type: DataTypes.ENUM('pending', 'declined', 'paying', 'paid'),
         defaultValue: 'pending',
         allowNull: false,
         comment: '状态',
