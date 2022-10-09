@@ -202,22 +202,26 @@ const saveClaimData = async (ctx) => {
 const assembleResponseData = async (ctx) => {
   const { dataSaved, policy } = ctx;
   const { claim, claimInsureds } = dataSaved;
+  const { insureds } = policy;
 
   return {
     claimNo: claim.claimNo,
     policyNo: policy.policyNo,
     status: claim.status,
-    insureds: claimInsureds.map((insured) => ({
-      no: insured.no || undefined,
-      relationship: insured.relationship || undefined,
-      name: insured.name || undefined,
-      idType: insured.idType || undefined,
-      idNo: insured.idNo || undefined,
-      gender: insured.gender || undefined,
-      birth: insured.birth || undefined,
-      contactNo: insured.contactNo || undefined,
-      email: insured.email || undefined,
-    })),
+    insureds: claimInsureds.map((insured) => {
+      const policyInsured = insureds.find((ins) => ins.no === insured.no) || {};
+      return {
+        no: insured.no || undefined,
+        relationship: policyInsured.relationship || undefined,
+        name: policyInsured.name || undefined,
+        idType: policyInsured.idType || undefined,
+        idNo: policyInsured.idNo || undefined,
+        gender: policyInsured.gender || undefined,
+        birth: policyInsured.birth || undefined,
+        contactNo: policyInsured.contactNo || undefined,
+        email: policyInsured.email || undefined,
+      };
+    }),
   };
 };
 
