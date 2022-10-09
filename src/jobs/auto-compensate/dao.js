@@ -1,5 +1,10 @@
 const { Op } = require('sequelize');
-const { getCompensationTaskModel, getClaimModel } = require('../../models');
+const {
+  getCompensationTaskModel,
+  getClaimModel,
+  getPolicyModel,
+  getInsuredModel,
+} = require('../../models');
 const { error500 } = require('../../libraries/utils');
 
 /**
@@ -9,8 +14,13 @@ const { error500 } = require('../../libraries/utils');
 const queryPendingCompensationTasks = async () => {
   const CompensationTask = getCompensationTaskModel();
 
+  // 关联理赔单
   const Claim = getClaimModel();
   CompensationTask.belongsTo(Claim);
+
+  // 关联保单
+  const Policy = getPolicyModel();
+  Claim.belongsTo(Policy);
 
   // 查询
   const compensationTasks = await CompensationTask.findAll({
@@ -22,6 +32,10 @@ const queryPendingCompensationTasks = async () => {
       {
         model: Claim,
         attributes: ['bizConfig'],
+        include: {
+          model: Policy,
+          attributes: { exclude: ['bizConfig'] },
+        },
       },
     ],
     order: [['id', 'ASC']],
@@ -29,8 +43,19 @@ const queryPendingCompensationTasks = async () => {
   });
   if (!compensationTasks) return compensationTasks;
 
+  // 查询被保险人
+  const policyIds = compensationTasks.map((t) => t.Claim.Policy.id);
+  const allInsureds = await getInsuredModel().findAll({
+    where: {
+      policyId: {
+        [Op.in]: policyIds,
+      },
+    },
+  });
+
   // 数据处理
   compensationTasks.forEach((task, i) => {
+    // 解析业务配置
     if (task.Claim.bizConfig) {
       try {
         compensationTasks[i].Claim.bizConfigParsed = JSON.parse(
@@ -42,6 +67,11 @@ const queryPendingCompensationTasks = async () => {
     } else {
       compensationTasks[i].Claim.bizConfigParsed = {};
     }
+
+    // 被保险人
+    compensationTasks[i].Claim.Policy.insureds = allInsureds.filter(
+      (ins) => ins.policyId === task.Claim.Policy.id,
+    );
   });
 
   return compensationTasks;
