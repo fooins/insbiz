@@ -4,6 +4,7 @@ const {
   getClaimModel,
   getPolicyModel,
   getInsuredModel,
+  getClaimInsuredModel,
 } = require('../../models');
 const { error500 } = require('../../libraries/utils');
 
@@ -31,7 +32,6 @@ const queryPendingCompensationTasks = async () => {
     include: [
       {
         model: Claim,
-        attributes: ['bizConfig'],
         include: {
           model: Policy,
           attributes: { exclude: ['bizConfig'] },
@@ -44,11 +44,17 @@ const queryPendingCompensationTasks = async () => {
   if (!compensationTasks) return compensationTasks;
 
   // 查询被保险人
-  const policyIds = compensationTasks.map((t) => t.Claim.Policy.id);
   const allInsureds = await getInsuredModel().findAll({
     where: {
       policyId: {
-        [Op.in]: policyIds,
+        [Op.in]: compensationTasks.map((t) => t.Claim.Policy.id),
+      },
+    },
+  });
+  const insureds = await getClaimInsuredModel().findAll({
+    where: {
+      claimId: {
+        [Op.in]: compensationTasks.map((t) => t.Claim.id),
       },
     },
   });
@@ -71,6 +77,9 @@ const queryPendingCompensationTasks = async () => {
     // 被保险人
     compensationTasks[i].Claim.Policy.insureds = allInsureds.filter(
       (ins) => ins.policyId === task.Claim.Policy.id,
+    );
+    compensationTasks[i].Claim.insureds = insureds.filter(
+      (ins) => ins.claimId === task.Claim.id,
     );
   });
 
