@@ -44,7 +44,7 @@ const calPremiumAccept = (ctx, params) => {
       // 计算被保险人年龄
       const { effectiveTime } = policyData;
       const { birth } = insured;
-      const age = Math.abs(moment(effectiveTime).diff(birth, 'days'));
+      const age = Math.abs(moment(effectiveTime).diff(birth, 'years'));
 
       // 遍历区间
       insuredAge.ranges.forEach((range) => {
@@ -116,7 +116,7 @@ const calPremiumRenew = (ctx, params) => {
       // 计算被保险人年龄
       const { effectiveTime } = newPolicyData;
       const { birth } = insured;
-      const age = Math.abs(moment(effectiveTime).diff(birth, 'days'));
+      const age = Math.abs(moment(effectiveTime).diff(birth, 'years'));
 
       // 遍历区间
       insuredAge.ranges.forEach((range) => {
@@ -213,12 +213,12 @@ const calPremiumCancel = (ctx) => {
  * @param {object} params 计算参数
  */
 const calPremiumClaim = (ctx, params) => {
-  const { policy, claimData } = ctx;
+  const { policy, claim } = ctx;
   const { cardinal, insuredAge } = params;
 
   // 循环处理每个被保险人
   let totalSumInsured = 0;
-  claimData.insureds.forEach((insured, idx) => {
+  claim.insureds.forEach((insured, idx) => {
     // 保单中对应的被保险人
     const policyInsured = policy.insureds.find((i) => i.no === insured.no);
     // 保额
@@ -229,7 +229,7 @@ const calPremiumClaim = (ctx, params) => {
       // 计算被保险人年龄
       const { effectiveTime } = policy;
       const { birth } = policyInsured;
-      const age = Math.abs(moment(effectiveTime).diff(birth, 'days'));
+      const age = Math.abs(moment(effectiveTime).diff(birth, 'years'));
 
       // 遍历区间
       insuredAge.ranges.forEach((range) => {
@@ -247,14 +247,14 @@ const calPremiumClaim = (ctx, params) => {
     }
 
     // 设置被保险人保额
-    claimData.insureds[idx].sumInsured = sumInsured;
+    claim.insureds[idx].sumInsured = sumInsured;
 
     // 累计总保额
     totalSumInsured += sumInsured;
   });
 
   // 设置总保额
-  claimData.sumInsured = totalSumInsured;
+  claim.sumInsured = totalSumInsured;
 };
 
 /**
