@@ -7,6 +7,7 @@ const {
   getClaimInsuredModel,
 } = require('../../models');
 const { error500 } = require('../../libraries/utils');
+const { getDbConnection } = require('../../libraries/data-access');
 
 /**
  * 查询待处理的赔付任务
@@ -118,8 +119,71 @@ const updateCompensationTask = async (values, where) => {
   await getCompensationTaskModel().update(values, { where });
 };
 
+/**
+ * 自动理赔成功，更新相关数据
+ * @param {object} data
+ */
+const compensationSuccessed = async (data) => {
+  // 创建事务
+  const t = await getDbConnection().transaction();
+
+  try {
+    const { claim, task } = data;
+    const { insureds } = claim;
+
+    // 更新理赔单
+    await getClaimModel().update(
+      {
+        sumInsured: claim.sumInsured,
+        status: 'paying',
+      },
+      {
+        where: { id: claim.id },
+        transaction: t,
+      },
+    );
+
+    // 更新理赔单被保险人
+    for (let i = 0; i < insureds.length; i += 1) {
+      const insured = insureds[i];
+      // eslint-disable-next-line no-await-in-loop
+      await getClaimInsuredModel().update(
+        {
+          sumInsured: insured.sumInsured,
+        },
+        {
+          where: { id: insured.id },
+          transaction: t,
+        },
+      );
+    }
+
+    // 更新赔付任务
+    await getCompensationTaskModel().update(
+      {
+        status: 'succeed',
+        finishedAt: Date.now(),
+      },
+      {
+        where: { id: task.id },
+        transaction: t,
+      },
+    );
+
+    // 提交事务
+    await t.commit();
+  } catch (error) {
+    // 回滚事务
+    await t.rollback();
+
+    // 抛出错误
+    throw error;
+  }
+};
+
 module.exports = {
   queryPendingCompensationTasks,
   handingTasks,
   updateCompensationTask,
+  compensationSuccessed,
 };
