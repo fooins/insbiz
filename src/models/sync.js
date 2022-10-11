@@ -15,6 +15,7 @@ const {
   getClaimModel,
   getClaimInsuredModel,
   getJobModel,
+  getCompensationTaskModel,
 } = require('./index');
 
 /**
@@ -41,6 +42,7 @@ module.exports = async function syncModels(options = {}) {
   getClaimModel();
   getClaimInsuredModel();
   getJobModel();
+  getCompensationTaskModel();
 
   // 将模型同步到数据库（创建对应表）
   await getDbConnection().sync({

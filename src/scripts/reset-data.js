@@ -41,6 +41,7 @@ const resetData = async () => {
     version: 1,
     bizConfig: JSON.stringify({
       renew: { allowRenew: true },
+      claim: { autoCompensate: { enable: true } },
     }),
   });
   // 查询保险产品
@@ -68,10 +69,10 @@ const resetData = async () => {
   // 创建作业
   await getJobModel().bulkCreate([
     {
-      name: 'autoClaim',
-      description: '执行自动理赔',
+      name: 'autoCompensate',
+      description: '执行自动赔付',
       status: 'enable',
-      script: 'autoClaim',
+      script: 'autoCompensate',
       cron: '*/10 * * * * *',
     },
   ]);

@@ -27,7 +27,7 @@ module.exports = {
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
-              value: 100000,
+              value: 10,
             },
             {
               // 区间开始（包含）
@@ -37,7 +37,7 @@ module.exports = {
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
-              value: 50000,
+              value: 50,
             },
           ],
         },
@@ -55,8 +55,6 @@ module.exports = {
     relationship: {
       // 是否必须
       required: true,
-      // 允许的值
-      options: ['self', 'parents', 'brothers', 'sisters'],
     },
     // 姓名
     name: {
@@ -67,8 +65,6 @@ module.exports = {
     idType: {
       // 是否必须
       required: true,
-      // 允许的值
-      options: ['idcard', 'passport'],
     },
     // 证件号码
     idNo: {
@@ -79,23 +75,20 @@ module.exports = {
     gender: {
       // 是否必须
       required: true,
-      // 允许的值
-      options: ['man', 'female', 'other', 'unknown'],
     },
     // 出生日期
     birth: {
       // 是否必须
       required: true,
     },
-    // 联系号码
-    contactNo: {
-      // 是否必须
-      required: true,
-    },
-    // 电子邮箱地址
-    email: {
-      // 是否必须
-      required: true,
-    },
+  },
+  // 自动赔付相关
+  autoCompensate: {
+    // 是否开启自动赔付
+    enable: false,
+    // 允许的最大赔付金额（保额）
+    maximum: 100.0,
+    // 赔付器
+    compensator: 'default',
   },
 };

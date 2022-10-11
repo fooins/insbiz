@@ -697,9 +697,7 @@ Signature = ""
       "idType": "idcard",
       "idNo": "110101190101016798",
       "gender": "man",
-      "birth": "1901-01-01T00:00:00Z",
-      "contactNo": "+8613000000000",
-      "email": "8613000000000@qq.com"
+      "birth": "1901-01-01T00:00:00Z"
     }
   ]
 }
@@ -725,8 +723,6 @@ Signature = ""
 |  5  | `idNo`         | 字符串                             | [?](#required) | 证件号码。     |
 |  6  | `gender`       | [性别](#性别枚举-)                 | [?](#required) | 性别。         |
 |  7  | `birth`        | UTC 时间                           | [?](#required) | 出生日期。     |
-|  8  | `contactNo`    | 字符串                             | [?](#required) | 联系号码。     |
-|  9  | `email`        | 字符串                             | [?](#required) | 电子邮箱地址。 |
 
 ### 4.1.2. 响应数据 <!-- omit in toc -->
 

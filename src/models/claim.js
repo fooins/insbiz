@@ -29,14 +29,19 @@ module.exports = function getClaimModel() {
       },
       sumInsured: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
         comment: '总保额',
       },
       status: {
-        type: DataTypes.ENUM('pending', 'handing', 'declined', 'confirmed'),
+        type: DataTypes.ENUM('pending', 'declined', 'paying', 'paid'),
         defaultValue: 'pending',
         allowNull: false,
         comment: '状态',
+      },
+      bizConfig: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '业务规则配置(JSON格式)',
       },
     },
     {

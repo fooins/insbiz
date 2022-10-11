@@ -1,16 +1,9 @@
 const Joi = require('joi');
 const moment = require('moment');
 const dao = require('../../dao');
-const formulas = require('../../../../libraries/formulas');
 const { getBizSchema } = require('./biz-schema');
 const { getRedis } = require('../../../../libraries/redis');
-const {
-  error400,
-  error403,
-  error404,
-  error500,
-  hasOwnProperty,
-} = require('../../../../libraries/utils');
+const { error400, error403, error404 } = require('../../../../libraries/utils');
 
 /**
  * 校验保单号
@@ -58,7 +51,7 @@ const getPolicy = async (ctx, reqData, profile) => {
   if (!policy) throw error404('保单不存在');
   if (policy.producerId !== producer.id) throw error403();
   if (['canceled'].includes(policy.status)) {
-    throw error400('保单当前状态不允许退保');
+    throw error400('保单当前状态不允许理赔');
   }
   if (
     moment(policy.effectiveTime).isAfter(moment()) ||
@@ -80,7 +73,7 @@ const validation = async (ctx, reqData) => {
   const { claim } = policy.bizConfigParsed;
 
   // 是否存在待处理的理赔单
-  const pendingClaim = dao.queryClaim({
+  const pendingClaim = await dao.queryClaim({
     attributes: ['id'],
     where: { policyId: policy.id, status: 'pending' },
   });
@@ -109,25 +102,31 @@ const validation = async (ctx, reqData) => {
   // 检查被保险人
   const noSet = new Set();
   ctx.reqDataValidated.insureds.forEach((insured, idx) => {
-    const { no, idType, idNo } = insured;
+    const { no, relationship, name, idType, idNo, gender, birth } = insured;
 
-    // 原保单对应的被保险人
-    let orInsured = null;
-    if (no) {
-      orInsured = policy.insureds.find((i) => i.no === no);
-    } else {
-      orInsured = policy.insureds.find(
-        (i) => i.idType === idType && i.idNo === idNo,
-      );
-      if (orInsured) ctx.reqDataValidated.insureds[idx].no = orInsured.no;
-    }
-    if (!orInsured) throw error400('被保险人不存在或不属于当前保单');
+    // 匹配被保险人
+    const oriInsured = policy.insureds.find((ins) => {
+      if (
+        (no && no !== ins.no) ||
+        (relationship && relationship !== ins.relationship) ||
+        (name && name !== ins.name) ||
+        (idType && idType !== ins.idType) ||
+        (idNo && idNo !== ins.idNo) ||
+        (gender && gender !== ins.gender) ||
+        (birth &&
+          moment(birth).toISOString() !== moment(ins.birth).toISOString())
+      ) {
+        return false;
+      }
+      return true;
+    });
+    if (!oriInsured) throw error400(`第${idx + 1}个被保险人不存在`);
 
     // 重复校验
-    if (noSet.has(orInsured.no)) {
-      throw error400(`该被保险人重复(${orInsured.no}|${idNo})`);
+    if (noSet.has(oriInsured.no)) {
+      throw error400(`第${idx + 1}个被保险人重复`);
     } else {
-      noSet.add(orInsured.no);
+      noSet.add(oriInsured.no);
     }
   });
 };
@@ -139,48 +138,28 @@ const validation = async (ctx, reqData) => {
  */
 const generateClaimData = async (ctx, profile) => {
   const { policy, reqDataValidated } = ctx;
+  const { claim } = policy.bizConfigParsed;
+  const { autoCompensate } = claim;
   const { producer } = profile;
 
   const claimData = {
     policyId: policy.id,
     producerId: producer.id,
-    insureds: reqDataValidated.insureds,
+    bizConfig: JSON.stringify(claim),
+    insureds: reqDataValidated.insureds.map((ins) => ({
+      no: ins.no,
+    })),
   };
 
+  let compensationTaskData = null;
+  if (autoCompensate.enable) {
+    compensationTaskData = {
+      autoCompensate: true,
+    };
+  }
+
   ctx.claimData = claimData;
-};
-
-/**
- * 计算赔付金额
- * @param {object} ctx 上下文对象
- */
-const charging = async (ctx) => {
-  const { policy, claimData } = ctx;
-  const { claim } = policy.bizConfigParsed;
-  const { calculateMode, formula } = claim.premium;
-
-  // 计费
-  if (calculateMode === 'formula') {
-    const { name, params } = formula;
-
-    if (
-      !hasOwnProperty(formulas, name) ||
-      typeof formulas[name] !== 'function'
-    ) {
-      throw error500('计费公式有误');
-    }
-
-    formulas[name](ctx, 'claim', params);
-  }
-
-  // 校验
-  let totalSumInsured = 0;
-  claimData.insureds.forEach((insured) => {
-    totalSumInsured += insured.sumInsured;
-  });
-  if (totalSumInsured !== claimData.sumInsured) {
-    throw error500(`计费错误，被保险人总保额不等于理赔单总保额`);
-  }
+  ctx.compensationTaskData = compensationTaskData;
 };
 
 /**
@@ -204,11 +183,12 @@ const generateClaimNo = async (ctx) => {
  * @param {object} ctx 上下文对象
  */
 const saveClaimData = async (ctx) => {
-  const { claimData } = ctx;
+  const { claimData, compensationTaskData } = ctx;
 
   // 组装保存的数据
   const saveData = {
     claimData,
+    compensationTaskData,
   };
 
   // 保存理赔单
@@ -222,22 +202,26 @@ const saveClaimData = async (ctx) => {
 const assembleResponseData = async (ctx) => {
   const { dataSaved, policy } = ctx;
   const { claim, claimInsureds } = dataSaved;
+  const { insureds } = policy;
 
   return {
     claimNo: claim.claimNo,
     policyNo: policy.policyNo,
     status: claim.status,
-    insureds: claimInsureds.map((insured) => ({
-      no: insured.no || undefined,
-      relationship: insured.relationship || undefined,
-      name: insured.name || undefined,
-      idType: insured.idType || undefined,
-      idNo: insured.idNo || undefined,
-      gender: insured.gender || undefined,
-      birth: insured.birth || undefined,
-      contactNo: insured.contactNo || undefined,
-      email: insured.email || undefined,
-    })),
+    insureds: claimInsureds.map((insured) => {
+      const policyInsured = insureds.find((ins) => ins.no === insured.no) || {};
+      return {
+        no: insured.no || undefined,
+        relationship: policyInsured.relationship || undefined,
+        name: policyInsured.name || undefined,
+        idType: policyInsured.idType || undefined,
+        idNo: policyInsured.idNo || undefined,
+        gender: policyInsured.gender || undefined,
+        birth: policyInsured.birth || undefined,
+        contactNo: policyInsured.contactNo || undefined,
+        email: policyInsured.email || undefined,
+      };
+    }),
   };
 };
 
@@ -259,9 +243,6 @@ const applyClaims = async (reqData, profile) => {
 
   // 生成理赔单数据
   await generateClaimData(ctx, profile);
-
-  // 计算赔付金额
-  await charging(ctx);
 
   // 生成理赔单号
   await generateClaimNo(ctx);
