@@ -27,7 +27,7 @@ module.exports = {
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
-              value: 100000,
+              value: 10,
             },
             {
               // 区间开始（包含）
@@ -37,7 +37,7 @@ module.exports = {
               // 操作符 (加:add 减:subtract 乘:multiply)
               operator: 'add',
               // 值
-              value: 50000,
+              value: 50,
             },
           ],
         },

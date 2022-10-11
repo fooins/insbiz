@@ -33,7 +33,7 @@ module.exports = function getCompensationTaskModel() {
         comment: '处理完成时间',
       },
       failureReasons: {
-        type: DataTypes.STRING(512),
+        type: DataTypes.TEXT,
         allowNull: true,
         comment: '失败原因',
       },
