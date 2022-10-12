@@ -75,6 +75,13 @@ const resetData = async () => {
       script: 'autoCompensate',
       cron: '*/10 * * * * *',
     },
+    {
+      name: 'notifier',
+      description: '执行通知',
+      status: 'enable',
+      script: 'notifier',
+      cron: '*/10 * * * * *',
+    },
   ]);
 };
 
