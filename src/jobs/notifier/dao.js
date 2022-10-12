@@ -28,9 +28,17 @@ const queryPendingNotifyTasks = async () => {
   // 查询
   const notifyTasks = await NotifyTask.findAll({
     where: {
-      status: {
-        [Op.in]: ['pending', 'retry'],
-      },
+      [Op.or]: [
+        {
+          status: 'pending',
+        },
+        {
+          status: 'retry',
+          retryAt: {
+            [Op.lt]: Date.now(),
+          },
+        },
+      ],
     },
     include: Producer,
     order: [['id', 'ASC']],

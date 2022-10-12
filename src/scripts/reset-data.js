@@ -81,7 +81,7 @@ const resetData = async () => {
       description: '执行通知',
       status: 'enable',
       script: 'notifier',
-      cron: '*/10 * * * * *',
+      cron: '*/5 * * * * *',
     },
   ]);
 };
