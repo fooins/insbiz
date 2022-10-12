@@ -174,7 +174,7 @@ const compensationSuccessed = async (data) => {
     // 添加通知任务
     await getNotifyTaskModel().create(
       {
-        tye: 'ClaimStatusChange',
+        type: 'ClaimStatusChange',
         data: JSON.stringify({
           body: {
             type: 'ClaimStatusChange',
