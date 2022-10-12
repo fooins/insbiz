@@ -22,7 +22,7 @@ const queryPendingTasks = async () => {
  */
 const notify = async (task) => {
   // 更新任务
-  await dao.updateCompensationTask(
+  await dao.updateNotifyTask(
     {
       handledAt: Date.now(),
       retries: task.status === 'pending' ? 0 : task.retries + 1,

@@ -1,5 +1,9 @@
 const { Op } = require('sequelize');
-const { getNotifyTaskModel, getSecretModel } = require('../../models');
+const {
+  getNotifyTaskModel,
+  getSecretModel,
+  getProducerModel,
+} = require('../../models');
 
 /**
  * 更新通知任务
@@ -17,12 +21,9 @@ const updateNotifyTask = async (values, where) => {
 const queryPendingNotifyTasks = async () => {
   const NotifyTask = getNotifyTaskModel();
 
-  // 关联密钥
-  const Secret = getSecretModel();
-  NotifyTask.belongsTo(Secret, {
-    targetKey: 'producerId',
-    foreignKey: 'producerId',
-  });
+  // 关联渠道
+  const Producer = getProducerModel();
+  NotifyTask.belongsTo(Producer);
 
   // 查询
   const notifyTasks = await NotifyTask.findAll({
@@ -31,9 +32,28 @@ const queryPendingNotifyTasks = async () => {
         [Op.in]: ['pending', 'retry'],
       },
     },
-    include: Secret,
+    include: Producer,
     order: [['id', 'ASC']],
     limit: 20,
+  });
+  if (!notifyTasks || !notifyTasks.length) return notifyTasks;
+
+  // 查询密钥
+  const allSecret = await getSecretModel().findAll({
+    where: {
+      producerId: {
+        [Op.in]: notifyTasks.map((t) => t.producerId),
+      },
+    },
+    group: 'producerId',
+  });
+
+  // 数据处理
+  notifyTasks.forEach((task, i) => {
+    // 密钥
+    notifyTasks[i].Secret = allSecret.filter(
+      (s) => s.producerId === task.producerId,
+    );
   });
 
   return notifyTasks;

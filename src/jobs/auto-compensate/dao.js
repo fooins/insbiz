@@ -43,7 +43,7 @@ const queryPendingCompensationTasks = async () => {
     order: [['id', 'ASC']],
     limit: 10,
   });
-  if (!compensationTasks) return compensationTasks;
+  if (!compensationTasks || !compensationTasks.length) return compensationTasks;
 
   // 查询被保险人
   const allInsureds = await getInsuredModel().findAll({
