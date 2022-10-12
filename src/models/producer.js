@@ -27,6 +27,11 @@ module.exports = function getProducerModel() {
         allowNull: true,
         comment: '业务规则配置(JSON格式)',
       },
+      notifyUrl: {
+        type: DataTypes.STRING(512),
+        allowNull: true,
+        comment: '通知地址',
+      },
     },
     {
       comment: '销售渠道表',
