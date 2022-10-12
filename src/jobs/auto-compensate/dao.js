@@ -5,6 +5,7 @@ const {
   getPolicyModel,
   getInsuredModel,
   getClaimInsuredModel,
+  getNotifyTaskModel,
 } = require('../../models');
 const { error500 } = require('../../libraries/utils');
 const { getDbConnection } = require('../../libraries/data-access');
@@ -166,6 +167,27 @@ const compensationSuccessed = async (data) => {
       },
       {
         where: { id: task.id },
+        transaction: t,
+      },
+    );
+
+    // 添加通知任务
+    await getNotifyTaskModel().create(
+      {
+        tye: 'ClaimStatusChange',
+        data: JSON.stringify({
+          body: {
+            type: 'ClaimStatusChange',
+            content: {
+              claimNo: claim.claimNo,
+              policyNo: claim.Policy.policyNo,
+              status: 'paying',
+            },
+          },
+        }),
+        producerId: claim.Policy.producerId,
+      },
+      {
         transaction: t,
       },
     );
