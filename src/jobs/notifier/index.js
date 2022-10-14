@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
-const axios = require('axios').default;
+const axios = require('axios');
 const dao = require('./dao');
 const { error400 } = require('../../libraries/utils');
 const { aesDecrypt } = require('../../libraries/crypto');
@@ -113,7 +113,6 @@ const handler = async (task) => {
       failureReasons: JSON.stringify({
         message: error.message,
         stack: error.stack,
-        ...error,
       }),
       retryAt: null,
     };
