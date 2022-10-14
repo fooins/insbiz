@@ -25,6 +25,7 @@
   "homepage": "https://github.com/fooins/insbiz#readme",
   "dependencies": {
     "@koa/router": "^12.0.0",
+    "axios": "^1.1.2",
     "cls-rtracer": "^2.6.2",
     "config": "^3.3.7",
     "crypto-js": "^4.1.1",

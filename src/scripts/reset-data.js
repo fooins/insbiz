@@ -21,6 +21,7 @@ const resetData = async () => {
   await getProducerModel().create({
     name: '销售渠道001',
     code: 'PC1001',
+    notifyUrl: 'http://127.0.0.1:8081/notify',
   });
   // 查询渠道
   const producer = await getProducerModel().findOne({
@@ -74,6 +75,13 @@ const resetData = async () => {
       status: 'enable',
       script: 'autoCompensate',
       cron: '*/10 * * * * *',
+    },
+    {
+      name: 'notifier',
+      description: '执行通知',
+      status: 'enable',
+      script: 'notifier',
+      cron: '*/5 * * * * *',
     },
   ]);
 };

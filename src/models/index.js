@@ -13,6 +13,7 @@ const getClaimModel = require('./claim');
 const getClaimInsuredModel = require('./claim-insured');
 const getJobModel = require('./job');
 const getCompensationTaskModel = require('./compensation-task');
+const getNotifyTaskModel = require('./notify-task');
 
 module.exports = {
   getProducerModel,
@@ -30,4 +31,5 @@ module.exports = {
   getClaimInsuredModel,
   getJobModel,
   getCompensationTaskModel,
+  getNotifyTaskModel,
 };

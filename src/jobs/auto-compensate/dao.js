@@ -5,6 +5,7 @@ const {
   getPolicyModel,
   getInsuredModel,
   getClaimInsuredModel,
+  getNotifyTaskModel,
 } = require('../../models');
 const { error500 } = require('../../libraries/utils');
 const { getDbConnection } = require('../../libraries/data-access');
@@ -42,7 +43,7 @@ const queryPendingCompensationTasks = async () => {
     order: [['id', 'ASC']],
     limit: 10,
   });
-  if (!compensationTasks) return compensationTasks;
+  if (!compensationTasks || !compensationTasks.length) return compensationTasks;
 
   // 查询被保险人
   const allInsureds = await getInsuredModel().findAll({
@@ -166,6 +167,27 @@ const compensationSuccessed = async (data) => {
       },
       {
         where: { id: task.id },
+        transaction: t,
+      },
+    );
+
+    // 添加通知任务
+    await getNotifyTaskModel().create(
+      {
+        type: 'ClaimStatusChange',
+        data: JSON.stringify({
+          body: {
+            type: 'ClaimStatusChange',
+            content: {
+              claimNo: claim.claimNo,
+              policyNo: claim.Policy.policyNo,
+              status: 'paying',
+            },
+          },
+        }),
+        producerId: claim.Policy.producerId,
+      },
+      {
         transaction: t,
       },
     );
