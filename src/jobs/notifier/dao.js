@@ -4,6 +4,7 @@ const {
   getSecretModel,
   getProducerModel,
 } = require('../../models');
+const { error500 } = require('../../libraries/utils');
 
 /**
  * 更新通知任务
@@ -58,8 +59,19 @@ const queryPendingNotifyTasks = async () => {
 
   // 数据处理
   notifyTasks.forEach((task, i) => {
+    // 解析数据
+    if (task.data) {
+      try {
+        notifyTasks[i].dataParsed = JSON.parse(task.data);
+      } catch (error) {
+        throw error500('通知任务数据有误(data)', { cause: error });
+      }
+    } else {
+      notifyTasks[i].dataParsed = {};
+    }
+
     // 密钥
-    notifyTasks[i].Secret = allSecret.filter(
+    notifyTasks[i].Secrets = allSecret.filter(
       (s) => s.producerId === task.producerId,
     );
   });
