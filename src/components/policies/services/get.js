@@ -53,6 +53,7 @@ const getPolicy = async (reqData, profile) => {
     },
     queryApplicants: true,
     queryInsureds: true,
+    parseExtensions: true,
   });
   if (!policy) throw error404('保单不存在');
   if (policy.producerId !== producer.id) throw error403();
@@ -72,6 +73,7 @@ const getPolicy = async (reqData, profile) => {
     boundTime: policy.boundTime,
     premium: policy.premium,
     status: policy.status,
+    extensions: policy.extensionsParsed,
     applicants: applicants.map((applicant) => ({
       no: applicant.no,
       name: applicant.name,

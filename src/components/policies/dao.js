@@ -194,11 +194,28 @@ const getPolicyByNo = async (policyNo, options = {}) => {
   if (!policy) return policy;
 
   // 解析业务配置信息
-  if (options.parseBizConfig && policy.bizConfig) {
-    try {
-      policy.bizConfigParsed = JSON.parse(policy.bizConfig);
-    } catch (error) {
-      throw error500('保单数据有误(bizConfig)', { cause: error });
+  if (options.parseBizConfig) {
+    if (policy.bizConfig) {
+      try {
+        policy.bizConfigParsed = JSON.parse(policy.bizConfig);
+      } catch (error) {
+        throw error500('保单数据有误(bizConfig)', { cause: error });
+      }
+    } else {
+      policy.bizConfigParsed = {};
+    }
+  }
+
+  // 解析扩展信息
+  if (options.parseExtensions) {
+    if (policy.extensions) {
+      try {
+        policy.extensionsParsed = JSON.parse(policy.extensions);
+      } catch (error) {
+        throw error500('保单数据有误(extensions)', { cause: error });
+      }
+    } else {
+      policy.extensionsParsed = {};
     }
   }
 

@@ -238,6 +238,9 @@ Signature = ""
   "effectiveTime": "2022-02-02T00:00:00Z",
   "expiryTime": "2022-02-22T23:59:59Z",
   "premium": 12.34,
+  "extensions": {
+    "trackingNo": "123456"
+  },
   "applicants": [
     {
       "name": "张三",
@@ -278,8 +281,9 @@ Signature = ""
 |  5  | `effectiveTime`   | UTC 时间                  | [?](#required) | 保单生效时间。                                                                                   |
 |  6  | `expiryTime`      | UTC 时间                  | [?](#required) | 保单终止时间。                                                                                   |
 |  7  | `premium`         | 浮点值                    | [?](#required) | 总保费。精确到两位小数。                                                                         |
-|  8  | `applicants`      | [投保人](#applicants)数组 | [?](#required) | 投保人。                                                                                         |
-|  9  | `insureds`        | [被保险人](#insureds)数组 |       是       | 被保险人。                                                                                       |
+|  8  | `extensions`      | 对象                      | [?](#required) | 附加信息。                                                                                       |
+|  9  | `applicants`      | [投保人](#applicants)数组 | [?](#required) | 投保人。                                                                                         |
+| 10  | `insureds`        | [被保险人](#insureds)数组 |       是       | 被保险人。                                                                                       |
 
 <p id="applicants">投保人：</p>
 
@@ -325,6 +329,9 @@ Signature = ""
   "boundTime": "2022-02-02T00:00:00Z",
   "premium": 12.34,
   "status": "valid",
+  "extensions": {
+    "trackingNo": "123456"
+  },
   "applicants": [
     {
       "no": "f8062bebe66f",
@@ -372,8 +379,9 @@ Signature = ""
 | 11  | `boundTime`       | UTC 时间                      |  是  | 承保时间。     |
 | 12  | `premium`         | 浮点值                        |  是  | 总保费。       |
 | 12  | `status`          | [保单状态](#保单状态枚举-)    |  是  | 总保费。       |
-| 13  | `applicants`      | [投保人](#res-applicants)数组 |  是  | 投保人。       |
-| 14  | `insureds`        | [被保险人](#res-insureds)数组 |  是  | 被保险人。     |
+| 13  | `extensions`      | 对象                          |  是  | 附加信息。     |
+| 14  | `applicants`      | [投保人](#res-applicants)数组 |  是  | 投保人。       |
+| 15  | `insureds`        | [被保险人](#res-insureds)数组 |  是  | 被保险人。     |
 
 <p id="res-applicants">投保人：</p>
 
