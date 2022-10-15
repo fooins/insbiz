@@ -5,7 +5,7 @@
   "main": "src/start.js",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development INSBIZ_JOB=1 nodemon ./src/start.js",
-    "lint": "eslint ./src --fix",
+    "lint": "eslint . --fix",
     "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
     "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
   },
