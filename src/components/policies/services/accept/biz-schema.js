@@ -106,6 +106,35 @@ const getPremiumSchema = (bizConfig) => {
 
 /**
  * 根据业务规则配置获取对应的校验模式
+ * @param {object} bizConfig 业务规则配置（扩展信息相关）
+ * @returns {object} 校验模式（扩展信息相关）
+ */
+const getExtensionsSchema = (bizConfig) => {
+  const { trackingNo } = bizConfig;
+
+  // 默认校验模式
+  const schema = {};
+
+  // 物流单号
+  {
+    const { dataType, allowClientToSet, required } = trackingNo;
+    if (allowClientToSet) {
+      schema.trackingNo = Joi[dataType]();
+
+      // 是否必须
+      if (required) {
+        schema.trackingNo = schema.trackingNo.required();
+      }
+    }
+  }
+
+  return Object.keys(schema).length > 0
+    ? { extensions: Joi.object(schema).required() }
+    : { extensions: Joi.object(schema) };
+};
+
+/**
+ * 根据业务规则配置获取对应的校验模式
  * @param {object} bizConfig 业务规则配置（投保人相关）
  * @returns {object} 校验模式（投保人相关）
  */
@@ -354,11 +383,13 @@ const getInsuredsSchema = (bizConfig) => {
  * @returns {Joi.ObjectSchema} 校验模式
  */
 const getBizSchema = (acceptBizConfig) => {
-  const { period, premium, applicants, insureds } = acceptBizConfig || {};
+  const { period, premium, extensions, applicants, insureds } =
+    acceptBizConfig || {};
 
   const bizSchema = {
     ...getPeriodSchema(period),
     ...getPremiumSchema(premium),
+    ...getExtensionsSchema(extensions),
     ...getApplicantsSchema(applicants),
     ...getInsuredsSchema(insureds),
   };

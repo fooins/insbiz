@@ -251,6 +251,7 @@ const savePolicyData = async (ctx) => {
   saveData.productVersion = product.version;
   saveData.planId = plan.id;
   saveData.bizConfig = JSON.stringify(bizConfig);
+  saveData.extensions = JSON.stringify(policyData.extensions);
 
   // 保存保单
   ctx.policyDataSaved = await dao.savePolicy(saveData);
@@ -277,6 +278,7 @@ const assembleResponseData = (ctx) => {
     boundTime: policy.boundTime,
     premium: policy.premium,
     status: policy.status,
+    extensions: { ...policyData.extensions },
     applicants: applicants.map((applicant) => ({
       no: applicant.no,
       name: applicant.name,

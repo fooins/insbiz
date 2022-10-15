@@ -41,6 +41,7 @@ const resetData = async () => {
     code: 'PD001',
     version: 1,
     bizConfig: JSON.stringify({
+      accept: { extensions: { trackingNo: { required: true } } },
       renew: { allowRenew: true },
       claim: { autoCompensate: { enable: true } },
     }),

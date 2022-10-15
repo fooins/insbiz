@@ -91,6 +91,11 @@ module.exports = function getPolicyModel() {
         allowNull: false,
         comment: '状态',
       },
+      extensions: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '扩展信息',
+      },
     },
     {
       comment: '保单表',

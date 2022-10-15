@@ -1,3 +1,5 @@
+const { policy } = require('../extensions');
+
 module.exports = {
   // 保障期间相关
   period: {
@@ -142,6 +144,8 @@ module.exports = {
     // 允许的最大值
     maximum: 9999.0,
   },
+  // 扩展信息
+  extensions: policy,
   // 投保人相关
   applicants: {
     // 姓名
