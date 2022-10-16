@@ -1,4 +1,5 @@
 const moment = require('moment');
+const crypto = require('crypto');
 const { AppError, ErrorCodes } = require('./error-handling');
 
 /**
@@ -161,6 +162,34 @@ const parseIdCard = (idNo) => {
   return result;
 };
 
+/**
+ * 随眠指定时长
+ * @param {integer} timeout 指定时长
+ * @returns
+ */
+const sleep = async (timeout) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
+
+/**
+ * 生成 [min,max] 的随机整数
+ * @param {integer} min 最小值（包含）
+ * @param {integer} max 最大值（包含）
+ * @returns {integer}
+ */
+const getRandomNum = (min, max) =>
+  parseInt(Math.random() * (max - min + 1) + min, 10);
+
+/**
+ * 执行 MD5 加密
+ * @param {string} data
+ * @returns
+ */
+const md5 = (data) => crypto.createHash('md5').update(data).digest('hex');
+
 module.exports = {
   error400,
   error403,
@@ -169,4 +198,7 @@ module.exports = {
   hasOwnProperty,
   timeCorrectTo,
   parseIdCard,
+  sleep,
+  getRandomNum,
+  md5,
 };
