@@ -150,15 +150,15 @@ const getPolicyByReqData = async (ctx, reqData) => {
  * @param {object} policy 保单信息
  * @returns {object} 响应的数据
  */
-const assembleResponseDataByPolicy = async (policy) => {
+const assembleResponseDataByPolicy = (policy) => {
   const { Contract, Product, Plan, applicants, insureds } = policy;
   return {
     orderNo: policy.orderNo,
     policyNo: policy.policyNo,
     contractCode: Contract.code,
-    contractVersion: Contract.version,
+    contractVersion: `${Contract.version}`,
     productCode: Product.code,
-    productVersion: Product.version,
+    productVersion: `${Product.version}`,
     planCode: Plan.code,
     effectiveTime: policy.effectiveTime,
     expiryTime: policy.expiryTime,
@@ -501,7 +501,7 @@ const savePolicyData = async (ctx) => {
  * @param {object} ctx 上下文对象
  */
 const assembleResponseData = (ctx) => {
-  const { policyDataSaved, policyData } = ctx;
+  const { policyDataSaved, policyData, product } = ctx;
   const { policy, applicants, insureds } = policyDataSaved;
 
   return {
@@ -509,8 +509,8 @@ const assembleResponseData = (ctx) => {
     policyNo: policy.policyNo,
     contractCode: policyData.contractCode,
     contractVersion: policyData.contractVersion,
-    productCode: policyData.productCode,
-    productVersion: policyData.productVersion,
+    productCode: product.code,
+    productVersion: `${product.version}`,
     planCode: policyData.planCode,
     effectiveTime: policy.effectiveTime,
     expiryTime: policy.expiryTime,
