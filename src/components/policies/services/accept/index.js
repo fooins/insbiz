@@ -5,6 +5,9 @@ const {
   error400,
   error500,
   hasOwnProperty,
+  sleep,
+  getRandomNum,
+  md5,
 } = require('../../../../libraries/utils');
 const { getBizConfig } = require('../../../../libraries/biz-config');
 const { getRedis } = require('../../../../libraries/redis');
@@ -12,6 +15,248 @@ const dao = require('../../dao');
 const formulas = require('../../../../libraries/formulas');
 const { getBizSchema, getBizSchemaForAdjusted } = require('./biz-schema');
 const { adjustPolicyData } = require('./policy-data');
+const {
+  AppError,
+  ErrorCodes,
+} = require('../../../../libraries/error-handling');
+
+/**
+ * 获取占位标识
+ * @param {object} ctx 上下文对象
+ * @param {object} reqData 请求数据
+ * @returns {string} 占位标识
+ */
+const getPlaceholderKey = (ctx, reqData) => {
+  const { policyData } = ctx;
+  const { applicants, insureds } = reqData;
+
+  let placeholderKey = `${policyData.orderNo}${ctx.producer.id}`;
+
+  if (applicants) {
+    const obj = {};
+    applicants.forEach((applicant) => {
+      const { name = '', idType = '', idNo = '' } = applicant;
+      const key = md5(`${name}${idType}${idNo}`);
+      obj[key] = key;
+    });
+
+    const keys = Object.keys(obj);
+    keys.sort();
+
+    keys.forEach((key) => {
+      placeholderKey += key;
+    });
+  }
+
+  if (insureds) {
+    const obj = {};
+    insureds.forEach((insured) => {
+      const { name = '', idType = '', idNo = '' } = insured;
+      const key = md5(`${name}${idType}${idNo}`);
+      obj[key] = key;
+    });
+
+    const keys = Object.keys(obj);
+    keys.sort();
+
+    keys.forEach((key) => {
+      placeholderKey += key;
+    });
+  }
+
+  placeholderKey = `accept:${md5(placeholderKey)}`;
+  ctx.placeholderKey = placeholderKey;
+
+  return placeholderKey;
+};
+
+/**
+ * 通过请求数据查询保单
+ * @param {object} ctx 上下文对象
+ * @param {object} reqData 请求数据
+ * @returns {object|undefined}
+ */
+const getPolicyByReqData = async (ctx, reqData) => {
+  const { policyData, producer } = ctx;
+  const { applicants: reqApplicants, insureds: reqInsureds } = reqData;
+
+  const policy = await dao.getPolicyByOrderNo(
+    `${policyData.orderNo}`.trim(),
+    producer.id,
+    {
+      attributes: { exclude: ['bizConfig'] },
+      includeContract: {
+        attributes: ['code', 'version'],
+      },
+      includeProduct: {
+        attributes: ['code', 'version'],
+      },
+      includePlan: {
+        attributes: ['code', 'version'],
+      },
+      queryApplicants: true,
+      queryInsureds: true,
+      parseExtensions: true,
+    },
+  );
+  if (!policy) return undefined;
+  const { applicants: policyApplicants, insureds: policyInsureds } = policy;
+
+  // 比对投保人
+  for (let i = 0; i < policyApplicants.length; i += 1) {
+    const applicant = policyApplicants[i];
+
+    const reqApplicant = reqApplicants.find(
+      (a) =>
+        `${a.name}`.trim() === applicant.name &&
+        `${a.idType}`.trim() === applicant.idType &&
+        `${a.idNo}`.trim() === applicant.idNo,
+    );
+
+    if (!reqApplicant) {
+      throw AppError('订单号已存在', {
+        code: ErrorCodes.InvalidRequest,
+        HTTPStatus: 400,
+        target: 'orderNo',
+      });
+    }
+  }
+
+  // 比对被保险人
+  for (let i = 0; i < policyInsureds.length; i += 1) {
+    const insured = policyInsureds[i];
+
+    const reqInsured = reqInsureds.find(
+      (ins) =>
+        `${ins.name}`.trim() === insured.name &&
+        `${ins.idType}`.trim() === insured.idType &&
+        `${ins.idNo}`.trim() === insured.idNo,
+    );
+
+    if (!reqInsured) {
+      throw AppError('订单号已存在', {
+        code: ErrorCodes.InvalidRequest,
+        HTTPStatus: 400,
+        target: 'orderNo',
+      });
+    }
+  }
+
+  return policy;
+};
+
+/**
+ * 组装响应数据（通过已存在的保单信息）
+ * @param {object} policy 保单信息
+ * @returns {object} 响应的数据
+ */
+const assembleResponseDataByPolicy = async (policy) => {
+  const { Contract, Product, Plan, applicants, insureds } = policy;
+  return {
+    orderNo: policy.orderNo,
+    policyNo: policy.policyNo,
+    contractCode: Contract.code,
+    contractVersion: Contract.version,
+    productCode: Product.code,
+    productVersion: Product.version,
+    planCode: Plan.code,
+    effectiveTime: policy.effectiveTime,
+    expiryTime: policy.expiryTime,
+    boundTime: policy.boundTime,
+    premium: policy.premium,
+    status: policy.status,
+    extensions: policy.extensionsParsed,
+    applicants: applicants.map((applicant) => ({
+      no: applicant.no,
+      name: applicant.name,
+      idType: applicant.idType,
+      idNo: applicant.idNo,
+      gender: applicant.gender,
+      birth: applicant.birth,
+      contactNo: applicant.contactNo,
+      email: applicant.email,
+    })),
+    insureds: insureds.map((insured) => ({
+      no: insured.no,
+      relationship: insured.relationship,
+      name: insured.name,
+      idType: insured.idType,
+      idNo: insured.idNo,
+      gender: insured.gender,
+      birth: insured.birth,
+      contactNo: insured.contactNo,
+      email: insured.email,
+      premium: insured.premium,
+    })),
+  };
+};
+
+/**
+ * 幂等处理
+ * @param {object} ctx 上下文对象
+ * @param {object} reqData 请求数据
+ */
+const idempotent = async (ctx, reqData) => {
+  // 是否有相同的请求正在处理
+  const placeholderKey = getPlaceholderKey(ctx, reqData);
+  const setRst = await getRedis().setnx(placeholderKey, '1');
+  const handing = setRst === 0;
+
+  // 没有相同的请求
+  if (!handing) {
+    // 查询保单
+    const policy = await getPolicyByReqData(ctx, reqData);
+
+    // 返回成功结果
+    if (policy) {
+      ctx.responseData = assembleResponseDataByPolicy(policy);
+      return;
+    }
+
+    // 继续投保逻辑
+    return;
+  }
+
+  // 等待
+  let totalWaitingTime = 0; // 总等待时长
+  const waitingLimit = 10000; // 等待时长限制（毫秒）
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    // 随机等待一定的时长（可控范围内）
+    const waitingTime = getRandomNum(200, 1000);
+    totalWaitingTime += waitingTime;
+    // eslint-disable-next-line no-await-in-loop
+    await sleep(waitingTime);
+
+    // 处理中的请求是否已完成
+    // eslint-disable-next-line no-await-in-loop
+    const setAgainRst = await getRedis().setnx(placeholderKey, '1');
+    const done = setAgainRst === 1;
+    if (done) {
+      // 查询保单
+      // eslint-disable-next-line no-await-in-loop
+      const policy = await getPolicyByReqData(ctx, reqData);
+
+      // 返回成功结果
+      if (policy) {
+        ctx.responseData = assembleResponseDataByPolicy(policy);
+        return;
+      }
+
+      // 查不到保单则报错
+      throw AppError('保单数据有误', { code: ErrorCodes.InternalServerError });
+    }
+
+    // 总等待时长是否超过限制
+    const over = totalWaitingTime > waitingLimit;
+    if (over) {
+      throw AppError('服务超时，请稍候再试', {
+        code: ErrorCodes.ServiceUnavailable,
+        HTTPStatus: 503,
+      });
+    }
+  }
+};
 
 /**
  * 执行基本校验
@@ -63,15 +308,9 @@ const basalValidation = async (ctx, reqData, profile) => {
   if (!producer) throw error500('获取销售渠道信息失败');
   ctx.producer = producer;
 
-  // 检查订单号
-  const exists = await dao.getPolicyByOrderNo(
-    ctx.policyData.orderNo,
-    producer.id,
-    {
-      attributes: ['id'],
-    },
-  );
-  if (exists) throw error400('订单号已存在', { target: 'orderNo' });
+  // 幂等处理
+  await idempotent(ctx, reqData);
+  if (ctx.responseData) return;
 
   // 检查契约
   const contract = await dao.getContractByCode(
@@ -314,25 +553,31 @@ const acceptInsurance = async (reqData, profile) => {
   // 定义一个上下文变量
   const ctx = {};
 
-  // 基础校验
-  await basalValidation(ctx, reqData, profile);
+  try {
+    // 基础校验
+    await basalValidation(ctx, reqData, profile);
+    if (ctx.responseData) return ctx.responseData;
 
-  // 业务规则校验
-  await bizValidation(ctx, reqData);
+    // 业务规则校验
+    await bizValidation(ctx, reqData);
 
-  // 计费
-  await charging(ctx);
+    // 计费
+    await charging(ctx);
 
-  // 生成保单号
-  await generatePolicyNo(ctx);
+    // 生成保单号
+    await generatePolicyNo(ctx);
 
-  // 保存数据
-  await savePolicyData(ctx);
+    // 保存数据
+    await savePolicyData(ctx);
 
-  // 组装响应数据
-  const responseData = assembleResponseData(ctx);
-
-  return responseData;
+    // 组装响应数据
+    return assembleResponseData(ctx);
+  } finally {
+    // 删除占位标识
+    if (ctx.placeholderKey) {
+      await getRedis().del(ctx.placeholderKey);
+    }
+  }
 };
 
 module.exports = {
