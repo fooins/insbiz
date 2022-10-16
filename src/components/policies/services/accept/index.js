@@ -556,7 +556,9 @@ const acceptInsurance = async (reqData, profile) => {
   try {
     // 基础校验
     await basalValidation(ctx, reqData, profile);
-    if (ctx.responseData) return ctx.responseData;
+    if (ctx.responseData) {
+      return { responseData: ctx.responseData, status: 200 };
+    }
 
     // 业务规则校验
     await bizValidation(ctx, reqData);
@@ -571,7 +573,8 @@ const acceptInsurance = async (reqData, profile) => {
     await savePolicyData(ctx);
 
     // 组装响应数据
-    return assembleResponseData(ctx);
+    const responseData = assembleResponseData(ctx);
+    return { responseData, status: 201 };
   } finally {
     // 删除占位标识
     if (ctx.placeholderKey) {

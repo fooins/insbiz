@@ -7,11 +7,11 @@ const router = new Router();
 
 // 承保
 router.post('/policies', async (ctx) => {
-  const responseData = await accept.acceptInsurance(
+  const { responseData, status } = await accept.acceptInsurance(
     ctx.request.body,
     ctx.profile,
   );
-  respSucc(ctx, responseData);
+  respSucc(ctx, responseData, { status });
 });
 
 // 报价
