@@ -413,6 +413,123 @@ const bizValidation = async (ctx, reqData) => {
 };
 
 /**
+ * 执行重复投保校验
+ * @param {object} ctx 上下文对象
+ */
+const repeatInsuredValidation = async (ctx) => {
+  const { policyData, product, plan, bizConfig } = ctx;
+  const { insureds } = policyData;
+  const { insureds: bizConfigInsureds } = bizConfig.accept;
+  const { primaryFields } = bizConfigInsureds;
+
+  // 是否有任意一个被保险人正在投保中
+  let handing = false;
+  const insuredPlaceholderKeys = {};
+  for (let i = 0; i < insureds.length; i += 1) {
+    const insured = insureds[i];
+
+    // 生成占位标识
+    let insuredPlaceholderKey = `${product.id}${product.version}${plan.id}`;
+    primaryFields.forEach((field) => {
+      if (field === 'birth') {
+        insuredPlaceholderKey += moment(insured[field]).format('YYYYMMDD');
+      } else {
+        insuredPlaceholderKey += insured[field];
+      }
+    });
+    insuredPlaceholderKey = `accept-insured:${md5(insuredPlaceholderKey)}`;
+
+    // 执行占位
+    // eslint-disable-next-line no-await-in-loop
+    const setRst = await getRedis().setnx(insuredPlaceholderKey, '1');
+    insuredPlaceholderKeys[insuredPlaceholderKey] = setRst;
+
+    // 任意一个占位失败，表示有相关被保险人正在投保中
+    if (setRst === 0) handing = true;
+  }
+  ctx.insuredPlaceholderKeys = insuredPlaceholderKeys;
+
+  // 有被保险人正在投保中
+  if (handing) {
+    // 等待
+    let totalWaitingTime = 0; // 总等待时长
+    const waitingLimit = 10000; // 等待时长限制（毫秒）
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      // 随机等待一定的时长（可控范围内）
+      const waitingTime = getRandomNum(200, 1000);
+      totalWaitingTime += waitingTime;
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(waitingTime);
+
+      // 投保中的请求是否已完成
+      let done = true;
+      const keysArr = Object.keys(insuredPlaceholderKeys);
+      for (let i = 0; i < keysArr.length; i += 1) {
+        const key = keysArr[i];
+        if (insuredPlaceholderKeys[key] === 0) {
+          // eslint-disable-next-line no-await-in-loop
+          const setAgainRst = await getRedis().setnx(key, '1');
+          insuredPlaceholderKeys[key] = setAgainRst;
+          if (setAgainRst === 0) done = false;
+        }
+      }
+      if (done) break;
+
+      // 总等待时长是否超过限制
+      const over = totalWaitingTime > waitingLimit;
+      if (over) {
+        throw AppError('服务超时，请稍候再试', {
+          code: ErrorCodes.ServiceUnavailable,
+          HTTPStatus: 503,
+        });
+      }
+    }
+  }
+
+  // 查询重复投保的被保险人
+  const repeatInsureds = await dao.queryRepeatInsureds({
+    productId: product.id,
+    productVersion: product.version,
+    planId: plan.id,
+    effectiveTime: policyData.effectiveTime,
+    expiryTime: policyData.expiryTime,
+    insureds: insureds.map((ins) => {
+      const rst = {};
+      primaryFields.forEach((field) => {
+        rst[field] = ins[field];
+      });
+      return rst;
+    }),
+  });
+  if (repeatInsureds && repeatInsureds.length > 0) {
+    const details = [];
+    for (let i = 0; i < insureds.length; i += 1) {
+      const insured = insureds[i];
+
+      const repeat = repeatInsureds.find((ins) => {
+        let rst = true;
+        primaryFields.forEach((field) => {
+          if (insured[field] !== ins[field]) rst = false;
+        });
+        return rst;
+      });
+
+      if (repeat) {
+        details.push({
+          target: `insureds[${i}]`,
+          message: primaryFields.map((pf) => repeat[pf]).join(' '),
+        });
+      }
+    }
+    throw error400('被保险人重复投保', {
+      target: 'insureds',
+      details,
+    });
+  }
+};
+
+/**
  * 计算保费
  * @param {object} ctx 上下文对象
  */
@@ -563,6 +680,9 @@ const acceptInsurance = async (reqData, profile) => {
     // 业务规则校验
     await bizValidation(ctx, reqData);
 
+    // 重复投保校验
+    await repeatInsuredValidation(ctx);
+
     // 计费
     await charging(ctx);
 
@@ -579,6 +699,16 @@ const acceptInsurance = async (reqData, profile) => {
     // 删除占位标识
     if (ctx.placeholderKey) {
       await getRedis().del(ctx.placeholderKey);
+    }
+    if (ctx.insuredPlaceholderKeys) {
+      const keys = Object.keys(ctx.insuredPlaceholderKeys);
+      for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        if (ctx.insuredPlaceholderKeys[key] === 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await getRedis().del(key);
+        }
+      }
     }
   }
 };
