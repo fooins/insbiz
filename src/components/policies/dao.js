@@ -326,6 +326,66 @@ const saveEndorsement = async (saveData) => {
   }
 };
 
+/**
+ * 查询重复投保的被保险人
+ * @param {object} options
+ * @returns {array}
+ */
+const queryRepeatInsureds = async (options) => {
+  const {
+    productId,
+    productVersion,
+    planId,
+    effectiveTime,
+    expiryTime,
+    insureds,
+  } = options;
+
+  const Insured = getInsuredModel();
+  const Policy = getPolicyModel();
+  Insured.belongsTo(Policy);
+
+  return Insured.findAll({
+    include: [
+      {
+        model: Policy,
+        as: 'Policy',
+        attributes: [],
+      },
+    ],
+    where: {
+      [Op.and]: [
+        {
+          '$Policy.status$': 'valid',
+          '$Policy.productId$': productId,
+          '$Policy.productVersion$': productVersion,
+          '$Policy.planId$': planId,
+        },
+        {
+          [Op.or]: [
+            {
+              '$Policy.effectiveTime$': { [Op.gte]: effectiveTime },
+              '$Policy.expiryTime$': { [Op.lte]: expiryTime },
+            },
+            {
+              '$Policy.effectiveTime$': { [Op.lte]: effectiveTime },
+              '$Policy.expiryTime$': { [Op.gte]: effectiveTime },
+            },
+            {
+              '$Policy.effectiveTime$': { [Op.lte]: expiryTime },
+              '$Policy.expiryTime$': { [Op.gte]: expiryTime },
+            },
+          ],
+        },
+        {
+          [Op.or]: insureds.map((ins) => ({ ...ins })),
+        },
+      ],
+    },
+    group: Object.keys(insureds[0]),
+  });
+};
+
 module.exports = {
   getPolicyByOrderNo,
   getProducerByCode,
@@ -334,4 +394,5 @@ module.exports = {
   savePolicy,
   getPolicyByNo,
   saveEndorsement,
+  queryRepeatInsureds,
 };

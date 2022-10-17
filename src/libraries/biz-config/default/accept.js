@@ -238,6 +238,8 @@ module.exports = {
   },
   // 被保险人相关
   insureds: {
+    // 主键字段（作为重复投保校验）
+    primaryFields: ['name', 'idType', 'idNo'],
     // 与投保人关系
     relationship: {
       // 是否必须
