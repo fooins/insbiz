@@ -35,7 +35,8 @@
 2. 更新配置：修改 `./config/development.js` 文件以覆盖默认配置。
 3. 克隆代码：`git clone https://github.com/fooins/insbiz.git`。
 4. 安装依赖：`npm install`。
-5. 启动程序：`npm run start:dev`。
+5. 同步模型：`npm run sync-models:dev`。
+6. 启动程序：`npm run start:dev`。
 
 ## 环境变量
 
