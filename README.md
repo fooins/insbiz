@@ -31,7 +31,7 @@
 
 ## 使用说明
 
-1. 准备工作：安装 Node.js、MySQL、Redis 和 Git。
+1. 准备工作：安装 Node.js(16.x)、MySQL(8.x)、Redis(7.x) 和 Git。
 2. 克隆代码：`git clone https://github.com/fooins/insbiz.git`。
 3. 更新配置：修改 `./config/development.js` 文件以覆盖默认配置。
 4. 安装依赖：`npm install`。
