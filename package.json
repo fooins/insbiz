@@ -5,8 +5,10 @@
   "main": "src/start.js",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development INSBIZ_JOB=1 nodemon ./src/start.js",
+    "start": "NODE_ENV=production INSBIZ_JOB=1 node ./src/start.js",
     "lint": "eslint . --fix",
     "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
+    "sync-models": "NODE_ENV=production node ./src/scripts/sync-models.js",
     "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
   },
   "pre-commit": [
