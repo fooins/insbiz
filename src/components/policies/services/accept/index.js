@@ -114,9 +114,7 @@ const getPolicyByReqData = async (ctx, reqData) => {
     );
 
     if (!reqApplicant) {
-      throw AppError('订单号已存在', {
-        code: ErrorCodes.InvalidRequest,
-        HTTPStatus: 400,
+      throw error400('订单号已存在', {
         target: 'orderNo',
       });
     }
@@ -134,9 +132,7 @@ const getPolicyByReqData = async (ctx, reqData) => {
     );
 
     if (!reqInsured) {
-      throw AppError('订单号已存在', {
-        code: ErrorCodes.InvalidRequest,
-        HTTPStatus: 400,
+      throw error400('订单号已存在', {
         target: 'orderNo',
       });
     }
@@ -244,13 +240,13 @@ const idempotent = async (ctx, reqData) => {
       }
 
       // 查不到保单则报错
-      throw AppError('保单数据有误', { code: ErrorCodes.InternalServerError });
+      throw error500('保单数据有误');
     }
 
     // 总等待时长是否超过限制
     const over = totalWaitingTime > waitingLimit;
     if (over) {
-      throw AppError('服务超时，请稍候再试', {
+      throw new AppError('服务超时，请稍候再试', {
         code: ErrorCodes.ServiceUnavailable,
         HTTPStatus: 503,
       });
@@ -263,8 +259,9 @@ const idempotent = async (ctx, reqData) => {
  * @param {object} ctx 上下文对象
  * @param {object} reqData 请求数据
  * @param {object} profile 身份数据
+ * @param {object} options 选项
  */
-const basalValidation = async (ctx, reqData, profile) => {
+const basalValidation = async (ctx, reqData, profile, options = {}) => {
   // 组装待校验的数据
   const data = {};
   if (reqData.orderNo) data.orderNo = reqData.orderNo;
@@ -309,8 +306,11 @@ const basalValidation = async (ctx, reqData, profile) => {
   ctx.producer = producer;
 
   // 幂等处理
-  await idempotent(ctx, reqData);
-  if (ctx.responseData) return;
+
+  if (!options.quote) {
+    await idempotent(ctx, reqData);
+    if (ctx.responseData) return;
+  }
 
   // 检查契约
   const contract = await dao.getContractByCode(
@@ -479,7 +479,7 @@ const repeatInsuredValidation = async (ctx) => {
       // 总等待时长是否超过限制
       const over = totalWaitingTime > waitingLimit;
       if (over) {
-        throw AppError('服务超时，请稍候再试', {
+        throw new AppError('服务超时，请稍候再试', {
           code: ErrorCodes.ServiceUnavailable,
           HTTPStatus: 503,
         });
