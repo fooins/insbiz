@@ -5,8 +5,10 @@
   "main": "src/start.js",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development INSBIZ_JOB=1 nodemon ./src/start.js",
+    "start": "NODE_ENV=production INSBIZ_JOB=1 pm2 --name insbiz start ./src/start.js",
     "lint": "eslint . --fix",
     "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
+    "sync-models": "NODE_ENV=production node ./src/scripts/sync-models.js",
     "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
   },
   "pre-commit": [
@@ -37,6 +39,7 @@
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "node-schedule": "^2.1.0",
+    "pm2": "^5.2.2",
     "sequelize": "^6.21.4",
     "uuid": "^9.0.0",
     "winston": "^3.8.1",

@@ -1,4 +1,3 @@
-const evn = require('../libraries/env');
 const { getDbConnection } = require('../libraries/data-access');
 const {
   getProducerModel,
@@ -24,8 +23,6 @@ const {
  * @param {object} options 同步选项
  */
 module.exports = async function syncModels(options = {}) {
-  if (evn.isProd()) throw new Error('不允许生产环境执行！');
-
   const { force = false, alter = false } = options;
 
   // 定义模型

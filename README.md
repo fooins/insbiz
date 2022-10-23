@@ -11,23 +11,12 @@
 
 ```
 ├─ config  // 配置文件目录
-│  ├─ default.js  // 默认配置文件
-│  ├─ development.js  // 开发环境配置文件
-│  └─ production.js  // 生产环境配置文件
+├─ releases  // 发布信息目录
 │
 ├─ src  // 源代码目录
 │  ├─ components  // 业务组件目录
-│  │  └─ xxx  // 某个业务组件目录
-│  │     ├─ api-routes.js  // HTTP 接口路由
-│  │     ├─ dao.js  // 数据访问对象
-│  │     └─ service.js  // 业务逻辑实现
-│  │
-│  ├─ libraries  // 工具包目录
-│  │  ├─ error-handling.js  // 错误处理工具
-│  │  ├─ logger.js  // 日志工具
-│  │  └─ ...  // 更多工具
-│  │
 │  ├─ jobs  // 作业（定时任务）目录
+│  ├─ libraries  // 工具包目录
 │  ├─ models  // 数据库表模型目录
 │  ├─ scripts  // NPM 脚本目录
 │  │
@@ -42,11 +31,12 @@
 
 ## 使用说明
 
-1. 克隆代码 `git clone https://github.com/fooins/insbiz.git`
-
-2. 安装依赖 `npm install`
-
-3. 启动程序 `npm run start:dev`
+1. 准备工作：安装 Node.js(16.x)、MySQL(8.x)、Redis(7.x) 和 Git。
+2. 克隆代码：`git clone https://github.com/fooins/insbiz.git`。
+3. 更新配置：修改 `./config/development.js` 文件以覆盖默认配置。
+4. 安装依赖：`npm install`。
+5. 同步模型：`npm run sync-models:dev`。
+6. 启动程序：`npm run start:dev`。
 
 ## 环境变量
 
@@ -60,9 +50,6 @@
 ## 脚本命令
 
 - `start:dev`：启动开发环境程序服务。主要用于本地开发调试，代码变更后会自动重启。
-
 - `lint`：对 src 目录下的文件执行 ESLint 检查并修复可自动修复的错误或警告。
-
 - `sync-models:dev`：将所有模型同步到开发环境数据库，已经存在的表会自动根据模型调整为最新的结构。
-
 - `reset-data:dev`：在开发环境数据库中添加样本数据，在此之前会先清空数据并同步所有模型。
