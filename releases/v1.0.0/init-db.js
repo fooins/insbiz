@@ -1,13 +1,28 @@
+const config = require('config');
+const { Sequelize } = require('sequelize');
 const { getJobModel } = require('../../src/models');
-const { getDbConnection } = require('../../src/libraries/data-access');
 const syncModels = require('../../src/models/sync');
+const logger = require('../../src/libraries/logger')('data-access', {
+  noConsole: true,
+});
 
 /**
  * 初始化数据库
  */
 const initDB = async () => {
+  // 创建数据库连接（用于创建数据库）
+  const dbConnection = new Sequelize({
+    host: config.get('db.host'),
+    port: config.get('db.port'),
+    username: config.get('db.username'),
+    password: config.get('db.password'),
+    dialect: 'mysql',
+    logging: (msg) => logger.info(msg),
+    timezone: '+08:00',
+  });
+
   // 创建数据库
-  await getDbConnection().query('CREATE DATABASE `insbiz`;');
+  await dbConnection.query('CREATE DATABASE `insbiz`');
 
   // 同步模型
   await syncModels();
