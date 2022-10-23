@@ -41,7 +41,7 @@ const quotation = async (reqData, profile) => {
   const ctx = {};
 
   // 基础校验
-  await basalValidation(ctx, reqData, profile);
+  await basalValidation(ctx, reqData, profile, { quote: true });
 
   // 业务规则校验
   await bizValidation(ctx, reqData);

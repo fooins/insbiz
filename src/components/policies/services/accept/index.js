@@ -259,8 +259,9 @@ const idempotent = async (ctx, reqData) => {
  * @param {object} ctx 上下文对象
  * @param {object} reqData 请求数据
  * @param {object} profile 身份数据
+ * @param {object} options 选项
  */
-const basalValidation = async (ctx, reqData, profile) => {
+const basalValidation = async (ctx, reqData, profile, options = {}) => {
   // 组装待校验的数据
   const data = {};
   if (reqData.orderNo) data.orderNo = reqData.orderNo;
@@ -305,8 +306,11 @@ const basalValidation = async (ctx, reqData, profile) => {
   ctx.producer = producer;
 
   // 幂等处理
-  await idempotent(ctx, reqData);
-  if (ctx.responseData) return;
+
+  if (!options.quote) {
+    await idempotent(ctx, reqData);
+    if (ctx.responseData) return;
+  }
 
   // 检查契约
   const contract = await dao.getContractByCode(
