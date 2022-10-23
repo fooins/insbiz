@@ -114,9 +114,7 @@ const getPolicyByReqData = async (ctx, reqData) => {
     );
 
     if (!reqApplicant) {
-      throw AppError('订单号已存在', {
-        code: ErrorCodes.InvalidRequest,
-        HTTPStatus: 400,
+      throw error400('订单号已存在', {
         target: 'orderNo',
       });
     }
@@ -134,9 +132,7 @@ const getPolicyByReqData = async (ctx, reqData) => {
     );
 
     if (!reqInsured) {
-      throw AppError('订单号已存在', {
-        code: ErrorCodes.InvalidRequest,
-        HTTPStatus: 400,
+      throw error400('订单号已存在', {
         target: 'orderNo',
       });
     }
@@ -244,13 +240,13 @@ const idempotent = async (ctx, reqData) => {
       }
 
       // 查不到保单则报错
-      throw AppError('保单数据有误', { code: ErrorCodes.InternalServerError });
+      throw error500('保单数据有误');
     }
 
     // 总等待时长是否超过限制
     const over = totalWaitingTime > waitingLimit;
     if (over) {
-      throw AppError('服务超时，请稍候再试', {
+      throw new AppError('服务超时，请稍候再试', {
         code: ErrorCodes.ServiceUnavailable,
         HTTPStatus: 503,
       });
@@ -479,7 +475,7 @@ const repeatInsuredValidation = async (ctx) => {
       // 总等待时长是否超过限制
       const over = totalWaitingTime > waitingLimit;
       if (over) {
-        throw AppError('服务超时，请稍候再试', {
+        throw new AppError('服务超时，请稍候再试', {
           code: ErrorCodes.ServiceUnavailable,
           HTTPStatus: 503,
         });
