@@ -45,12 +45,11 @@ module.exports = async (ctx, next) => {
     ].join('|'),
   );
 
-  // 执行接口逻辑
   const start = Date.now();
-  await next();
-  const end = Date.now();
-  const cost = end - start;
-
-  // 记录响应日志
-  logger.info(['Res', ctx.length, ctx.status, `${cost}ms`].join('|'));
+  await next().finally(() => {
+    // 记录响应日志
+    const end = Date.now();
+    const cost = end - start;
+    logger.info(['Res', ctx.length, ctx.status, `${cost}ms`].join('|'));
+  });
 };
