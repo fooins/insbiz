@@ -1,10 +1,18 @@
 const { getJobModel } = require('../../src/models');
+const { getDbConnection } = require('../../src/libraries/data-access');
+const syncModels = require('../../src/models/sync');
 
 /**
- * 添加初始数据
+ * 初始化数据库
  */
-const initData = async () => {
-  // 创建作业
+const initDB = async () => {
+  // 创建数据库
+  await getDbConnection().query('CREATE DATABASE `insbiz`;');
+
+  // 同步模型
+  await syncModels();
+
+  // 创建初始数据：作业
   await getJobModel().bulkCreate([
     {
       name: 'autoCompensate',
@@ -23,10 +31,10 @@ const initData = async () => {
   ]);
 };
 
-initData()
+initDB()
   .then(() => {
     // eslint-disable-next-line no-console
-    console.info('添加初始数据成功');
+    console.info('初始化数据库成功');
   })
   .catch((error) => {
     // eslint-disable-next-line no-console

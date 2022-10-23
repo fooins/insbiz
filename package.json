@@ -8,7 +8,6 @@
     "start": "NODE_ENV=production INSBIZ_JOB=1 pm2 --name insbiz start ./src/start.js",
     "lint": "eslint . --fix",
     "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
-    "sync-models": "NODE_ENV=production node ./src/scripts/sync-models.js",
     "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
   },
   "pre-commit": [
