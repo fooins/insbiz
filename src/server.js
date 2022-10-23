@@ -1,3 +1,4 @@
+const config = require('config');
 const app = require('./app');
 const { respFail } = require('./libraries/response');
 const {
@@ -18,8 +19,8 @@ let httpServer;
 const startHttpServer = async () =>
   new Promise((resolve) => {
     // 定义端口和主机名
-    const port = process.env.PORT || 8080;
-    const hostname = process.env.HOST || '127.0.0.1';
+    const port = config.get('server.port');
+    const hostname = config.get('server.host');
 
     // 创建 HTTP 服务并监听端口
     httpServer = app.listen(port, hostname, () => {

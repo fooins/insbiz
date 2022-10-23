@@ -1,4 +1,5 @@
 const winston = require('winston');
+const config = require('config');
 const { startHttpServer } = require('./server');
 const { scheduleJob } = require('./scheduler');
 const { validateConfigs } = require('./libraries/configuration');
@@ -39,7 +40,7 @@ const logger = require('./libraries/logger')('start', {
     const addressInfo = await startHttpServer();
     logger.info('HTTP服务启动成功', { addressInfo });
 
-    if (process.env.INSBIZ_JOB) {
+    if (config.get('scheduleJob')) {
       await scheduleJob();
       logger.info('作业调度成功');
     }
