@@ -6,13 +6,14 @@
 - [数据库表结构](../../../.github/tree/main/profile/成立初期/sql)
 - [REST API 参考文档](./REST-API-reference-latest.md)
 - [版本发布记录](./releases)
-- 压测记录和报告
+- [压测记录和报告](./test/performance)
 
 ## 目录结构
 
 ```
 ├─ config  // 配置文件目录
 ├─ releases  // 发布信息目录
+├─ test  // 测试相关目录
 │
 ├─ src  // 源代码目录
 │  ├─ components  // 业务组件目录
