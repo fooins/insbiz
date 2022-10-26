@@ -1,8 +1,8 @@
 # 新系统上线压测
 
 压测目的：新系统上线压测以探知系统能力。  
-使用工具：JMeter(5.5)  
-系统版本：Insbiz 1.0.0  
+使用工具：[JMeter(5.5)](https://github.com/itabbot/learn/blob/main/性能测试/1.测试工具/1.1.JMeter.md)  
+系统版本：[Insbiz 1.0.0](../../../releases/v1.0.0)  
 最终结论：
 
 ## 目标
