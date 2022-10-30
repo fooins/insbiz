@@ -164,14 +164,11 @@ const handleRouteErrors = async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-    const {
-      code = ErrorCodes.GeneralException,
-      message = 'general exception',
-      HTTPStatus = 500,
-      target,
-      details,
-      innerError,
-    } = handleError(error) || {};
+    const appError = normalizeError(error);
+    const { code, message, HTTPStatus, target, details, innerError } =
+      `${appError.HTTPStatus}`.substring(0, 1) === '5'
+        ? handleError(appError) || {}
+        : appError;
 
     respFail(ctx, code, message, {
       status: HTTPStatus,
