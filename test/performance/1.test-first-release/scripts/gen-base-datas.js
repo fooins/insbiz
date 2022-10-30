@@ -108,6 +108,8 @@ const genDependencies = async (ctx) => {
     producer: ctx.producer,
     contract: ctx.contract,
   });
+
+  console.log('依赖数据准备就绪');
 };
 
 /**
@@ -120,12 +122,15 @@ const genQtyConfig = async (ctx) => {
 
   // 已有保单数
   const exists = await getPolicyModel().count();
+  console.log(`已存在 ${exists} 张保单`);
 
   // 仍需构造的保单数
   ctx.alsoNeed = total - exists;
+  console.log(`仍需构造 ${ctx.alsoNeed} 张保单`);
 
   // 每批构造的保单数量
   ctx.bulkSize = 100;
+  console.log(`每批构造 ${ctx.bulkSize} 张保单`);
 };
 
 /**
@@ -334,6 +339,10 @@ const gen = async () => {
       );
       await getClaimInsuredModel().bulkCreate(claimInsuredDatas);
     }
+
+    console.log(
+      `成功构造 ${policies.length} 张保单，${claimDatas.length} 张理赔单`,
+    );
   }
 };
 
