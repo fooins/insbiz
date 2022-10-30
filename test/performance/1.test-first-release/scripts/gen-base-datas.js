@@ -30,47 +30,39 @@ const {
 } = require('../../../../src/models');
 
 /**
- * 判断当前是否首次执行
- * @param {object} ctx 上下文变量
- */
-const isFirstRun = async (ctx) => {
-  const key = 'gen-base-datas';
-  const setRst = await getRedis().setnx(key, '1');
-  ctx.isFirstRun = setRst === 1;
-};
-
-/**
  * 创建依赖数据（渠道、契约、产品和计划等）
  * 非首次执行则不创建
  * @param {object} ctx 上下文变量
  */
 const genDependencies = async (ctx) => {
-  // 创建销售渠道
-  if (ctx.isFirstRun) {
-    await getProducerModel().create({
-      name: '销售渠道(基础依赖数据)',
-      code: 'PC-BASE',
-    });
-  }
-
   // 查询渠道
   ctx.producer = await getProducerModel().findOne({
     where: { code: 'PC-BASE' },
   });
 
-  // 创建密钥
-  await getSecretModel().create({
-    secretId: 'd73d0a29-0bea-42e5-a8a6-211bb998f8b6',
-    secretKey: aesEncrypt('n8Ih%mA9PL^X)%MN2e%cO(9=Uhczf7n+'),
-    producerId: ctx.producer.id,
+  // 创建销售渠道
+  if (!ctx.producer) {
+    await getProducerModel().create({
+      name: '销售渠道(基础依赖数据)',
+      code: 'PC-BASE',
+    });
+
+    ctx.producer = await getProducerModel().findOne({
+      where: { code: 'PC-BASE' },
+    });
+  }
+
+  // 查询渠道密钥
+  ctx.secret = await getSecretModel().findOne({
+    where: { secretId: 'd73d0a29-0bea-42e5-a8a6-211bb998f8b6' },
   });
 
-  // 创建保险产品
-  if (ctx.isFirstRun) {
-    await getProductModel().create({
-      name: '保险产品(基础依赖数据)',
-      code: 'PD-BASE',
-      version: 1,
+  // 创建密钥
+  if (!ctx.secret) {
+    await getSecretModel().create({
+      secretId: 'd73d0a29-0bea-42e5-a8a6-211bb998f8b6',
+      secretKey: aesEncrypt('n8Ih%mA9PL^X)%MN2e%cO(9=Uhczf7n+'),
+      producerId: ctx.producer.id,
     });
   }
 
@@ -79,13 +71,16 @@ const genDependencies = async (ctx) => {
     where: { code: 'PD-BASE' },
   });
 
-  // 创建保险计划
-  if (ctx.isFirstRun) {
-    await getPlanModel().create({
-      name: '保险计划(基础依赖数据)',
-      code: 'PL-BASE',
+  // 创建保险产品
+  if (!ctx.product) {
+    await getProductModel().create({
+      name: '保险产品(基础依赖数据)',
+      code: 'PD-BASE',
       version: 1,
-      productId: ctx.product.id,
+    });
+
+    ctx.product = await getProductModel().findOne({
+      where: { code: 'PD-BASE' },
     });
   }
 
@@ -94,14 +89,17 @@ const genDependencies = async (ctx) => {
     where: { code: 'PL-BASE' },
   });
 
-  // 创建授权契约
-  if (ctx.isFirstRun) {
-    await getContractModel().create({
-      code: 'C-BASE',
+  // 创建保险计划
+  if (!ctx.plan) {
+    await getPlanModel().create({
+      name: '保险计划(基础依赖数据)',
+      code: 'PL-BASE',
       version: 1,
-      producerId: ctx.producer.id,
       productId: ctx.product.id,
-      productVersion: ctx.product.version,
+    });
+
+    ctx.plan = await getPlanModel().findOne({
+      where: { code: 'PL-BASE' },
     });
   }
 
@@ -109,6 +107,21 @@ const genDependencies = async (ctx) => {
   ctx.contract = await getContractModel().findOne({
     where: { code: 'C-BASE' },
   });
+
+  // 创建授权契约
+  if (!ctx.contract) {
+    await getContractModel().create({
+      code: 'C-BASE',
+      version: 1,
+      producerId: ctx.producer.id,
+      productId: ctx.product.id,
+      productVersion: ctx.product.version,
+    });
+
+    ctx.contract = await getContractModel().findOne({
+      where: { code: 'C-BASE' },
+    });
+  }
 
   // 获取业务规则配置
   ctx.bizConfig = await getBizConfig({
@@ -310,9 +323,6 @@ const genClaimInsuredDatas = async (ctx, claims, insureds) => {
 const gen = async () => {
   // 定义一个上下文变量
   const ctx = {};
-
-  // 当前是否首次执行
-  await isFirstRun(ctx);
 
   // 创建依赖数据（渠道、契约、产品和计划等）
   // 非首次执行则不创建
