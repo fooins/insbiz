@@ -6,6 +6,7 @@ const moment = require('moment');
 const { getRedis } = require('../../../../src/libraries/redis');
 const { getBizConfig } = require('../../../../src/libraries/biz-config');
 const { getRandomNum } = require('../../../../src/libraries/utils');
+const { aesEncrypt } = require('../../../../src/libraries/crypto');
 const {
   getRandomPeriod,
   getRandomName,
@@ -14,6 +15,7 @@ const {
   getRandomBirth,
   getRandomContactNo,
   getRandomRelationship,
+  getSecretModel,
 } = require('./utils');
 const {
   getPolicyModel,
@@ -54,6 +56,13 @@ const genDependencies = async (ctx) => {
   // 查询渠道
   ctx.producer = await getProducerModel().findOne({
     where: { code: 'PC-BASE' },
+  });
+
+  // 创建密钥
+  await getSecretModel().create({
+    secretId: 'd73d0a29-0bea-42e5-a8a6-211bb998f8b5',
+    secretKey: aesEncrypt('n8Ih%mA9PL^X)%MN2e%cO(9=Uhczf7n+'),
+    producerId: ctx.producer.id,
   });
 
   // 创建保险产品
