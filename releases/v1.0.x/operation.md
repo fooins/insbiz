@@ -20,10 +20,11 @@
    - 创建表：`NODE_ENV=production node ./releases/v1.0.x/create-tables.js`。
    - 初始化数据：`NODE_ENV=production node ./releases/v1.0.x/init-datas.js`。
 
-4. 回滚发布：关闭服务即可。
+4. 回滚发布(按需)：关闭服务即可。
 
 ## 更新补丁
 
 1. 切换分支：`git checkout {分支名}`。
 2. 更新代码：`git pull`。
-3. 回滚代码：`git reset {指定版本}`
+3. 重启服务：`pm2 restart {任务id}`。
+4. 回滚代码(按需)：`git reset {指定版本}`。
