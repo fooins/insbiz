@@ -129,7 +129,7 @@ const genQtyConfig = async (ctx) => {
   console.log(`仍需构造 ${ctx.alsoNeed} 张保单`);
 
   // 每批构造的保单数量
-  ctx.bulkSize = 100;
+  ctx.bulkSize = 500;
   console.log(`每批构造 ${ctx.bulkSize} 张保单`);
 };
 
