@@ -27,4 +27,4 @@
 1. 切换分支：`git checkout {分支名}`。
 2. 更新代码：`git pull`。
 3. 重启服务：`pm2 restart {任务id}`。
-4. 回滚代码(按需)：`git reset {指定版本}`
+4. 回滚代码(按需)：`git reset {指定版本}`。
