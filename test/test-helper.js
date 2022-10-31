@@ -574,7 +574,7 @@ const getRandomIdNum = () => {
   const address = addresses[getRandomNum(0, addresses.length - 1)];
 
   // 7到14位是出生年月日，采用YYYYMMDD格式；
-  const year = getRandomNum(1920, 2004);
+  const year = getRandomNum(1970, 2004);
   const month = `${getRandomNum(1, 12)}`.padStart(2, '0');
   const day = `${getRandomNum(1, 28)}`.padStart(2, '0');
   const birthday = `${year}${month}${day}`;
