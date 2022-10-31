@@ -203,6 +203,31 @@ const genQuoteDatas = async (ctx, qty) => {
 };
 
 /**
+ * 构造承保数据
+ * @param {object} ctx 上下文变量
+ * @param {number} qty 数量
+ */
+const genAcceptDatas = async (ctx, qty) => {
+  // 请求地址
+  const url = `${ctx.host}/v1.0/policies`;
+
+  // 构造数据
+  const acceptDatas = [];
+  for (let i = 0; i < qty; i += 1) {
+    // 请求体
+    const bodyStr = JSON.stringify(genAcceptBody());
+
+    // 获取鉴权字符串
+    const authStr = getAuthStr(ctx, url, bodyStr);
+
+    acceptDatas.push([bodyStr, authStr]);
+  }
+
+  // 保存到文件
+  await saveToFile(acceptDatas, path.resolve(ctx.outputDir, 'accept.csv'));
+};
+
+/**
  * 执行数据构造
  */
 const gen = async () => {
@@ -217,6 +242,9 @@ const gen = async () => {
     // 构造报价数据
     await genQuoteDatas(ctx, 2);
 
+    // 构造承保数据
+    await genAcceptDatas(ctx, 4);
+
     //
     //
     //
@@ -225,7 +253,6 @@ const gen = async () => {
     //
     //
 
-    // 构造承保数据
     // 构造查询保单数据
     // 构造申请理赔数据
   }
