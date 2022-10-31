@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { getRandomNum } = require('../../../../src/libraries/utils');
+const { getRandomNum } = require('../src/libraries/utils');
 
 /**
  * 获取随机的保障期间

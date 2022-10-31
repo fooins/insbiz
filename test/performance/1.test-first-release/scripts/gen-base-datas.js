@@ -15,7 +15,7 @@ const {
   getRandomBirth,
   getRandomContactNo,
   getRandomRelationship,
-} = require('./utils');
+} = require('../../../test-helper');
 const {
   getPolicyModel,
   getApplicantModel,
