@@ -57,7 +57,7 @@ const getAuthInfo = async (ctx) => {
     `${timestamp}`.length !== 10 ||
     !/^[0-9]*$/.test(`${timestamp}`) ||
     !moment(timestamp * 1000).isValid() ||
-    moment(timestamp * 1000).isBefore(moment().subtract(1, 'minute'))
+    moment(timestamp * 1000).isBefore(moment().subtract(60, 'minute'))
   ) {
     throw error401();
   }
