@@ -70,6 +70,14 @@ module.exports = function getInsuredModel() {
       },
     },
     {
+      indexes: [
+        {
+          fields: ['policyId'],
+        },
+        {
+          fields: ['idNo', 'name', 'idType'],
+        },
+      ],
       comment: '被保险人表',
     },
   );

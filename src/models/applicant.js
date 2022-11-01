@@ -60,6 +60,11 @@ module.exports = function getApplicantModel() {
       },
     },
     {
+      indexes: [
+        {
+          fields: ['policyId'],
+        },
+      ],
       comment: '投保人表',
     },
   );
