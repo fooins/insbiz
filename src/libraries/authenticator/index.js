@@ -98,7 +98,7 @@ const verifySignature = (ctx, authInfo) => {
   const queryStr = getQueryStr(query);
 
   // 获取原始请求体
-  const rawBody = body[unparsed];
+  const rawBody = body[unparsed] || '';
 
   // 生成正确的签名值
   const signatureValid = CryptoJS.enc.Base64.stringify(
