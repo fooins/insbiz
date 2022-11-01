@@ -626,7 +626,7 @@ const getRandomId = () => {
   if (idType === 'idcard') {
     idNo = getRandomIdNum();
   } else {
-    idNo = `1${getRandomIdNum(1000000, 9999999)}`;
+    idNo = `${getRandomNum(1000000, 9999999)}`;
   }
 
   return { idType, idNo };
