@@ -15,11 +15,11 @@ const getRandomPeriod = (options = {}) => {
       .subtract(getRandomNum(1, 30), 'days')
       .toISOString(true);
   } else {
-    effectiveTime = moment().add(getRandomNum(1, 30), 'days').toISOString(true);
+    effectiveTime = moment().add(getRandomNum(2, 29), 'days').toISOString(true);
   }
 
   const expiryTime = moment(effectiveTime)
-    .add(getRandomNum(3, 12), 'months')
+    .add(getRandomNum(3, 11), 'months')
     .toISOString(true);
 
   return { effectiveTime, expiryTime };
