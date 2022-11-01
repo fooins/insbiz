@@ -3,9 +3,12 @@
 
 const fs = require('fs');
 const os = require('os');
+const Joi = require('joi');
 const path = require('path');
 const uuid = require('uuid');
 const CryptoJS = require('crypto-js');
+// eslint-disable-next-line import/no-unresolved
+const { parse: csvParse } = require('csv-parse/sync');
 const {
   getRandomPeriod,
   getRandomName,
@@ -18,16 +21,16 @@ const {
 const { getRandomNum, md5 } = require('../../../../src/libraries/utils');
 
 /**
- * 生成配置信息
+ * 初始化配置
  * @param {object} ctx 上下文变量
  */
-const genConfig = async (ctx) => {
+const initConfig = (ctx) => {
   // 线程数
   const numberOfThreads = 1;
   // 循环次数
   const loopCount = 1;
-  // 目标总保单数量
-  ctx.total = numberOfThreads * loopCount * 4;
+  // 总任务数
+  ctx.total = numberOfThreads * loopCount;
 
   // 签名密钥标识
   ctx.secretId = 'd73d0a29-0bea-42e5-a8a6-211bb998f8b6';
@@ -39,6 +42,43 @@ const genConfig = async (ctx) => {
 
   // 文件输出目录
   ctx.outputDir = 'C:/Users/Max Fang/Desktop/';
+  // 保单数据文件
+  ctx.policyDataFile = 'C:/Users/Max Fang/Desktop/policy-datas.csv';
+};
+
+/**
+ * 初始化
+ * @param {object} ctx 上下文变量
+ */
+const init = async (ctx) => {
+  // 初始化配置
+  initConfig(ctx);
+
+  // 校验配置
+  const { error } = Joi.object({
+    total: Joi.number().min(1).max(99999).required(),
+    secretId: Joi.string().min(10).max(100).required(),
+    secretKey: Joi.string().min(10).max(100).required(),
+    host: Joi.string().min(10).max(100).required(),
+    outputDir: Joi.string().min(5).required(),
+    policyDataFile: Joi.string().min(5).required(),
+  }).validate(ctx, { allowUnknown: true, stripUnknown: true });
+  if (error) throw error;
+  if (!fs.existsSync(ctx.outputDir)) throw new Error('文件输出目录不存在');
+  if (!fs.existsSync(ctx.policyDataFile)) throw new Error('保单数据文件不存在');
+
+  // 加载保单数据文件
+  ctx.policyDatas = csvParse(fs.readFileSync(ctx.policyDataFile), {
+    bom: true,
+    columns: true,
+    skip_empty_lines: true,
+  });
+  if (!ctx.policyDatas || !Array.isArray(ctx.policyDatas)) {
+    throw new Error('加载保单数据文件失败或数据为空');
+  }
+  if (ctx.policyDatas.length < ctx.total) {
+    throw new Error(`保单数据数量不够 ${ctx.total} 条`);
+  }
 };
 
 /**
@@ -228,33 +268,113 @@ const genAcceptDatas = async (ctx, qty) => {
 };
 
 /**
+ * 构造查询保单数据
+ * @param {object} ctx 上下文变量
+ * @param {number} qty 数量
+ */
+const genQueryDatas = async (ctx, qty) => {
+  if (ctx.pIdxForGenQueryDatas === undefined) {
+    ctx.pIdxForGenQueryDatas = 0;
+  }
+
+  // 构造数据
+  const queryDatas = [];
+  for (let i = 0; i < qty; i += 1) {
+    // 获取保单数据
+    if (ctx.pIdxForGenQueryDatas >= ctx.policyDatas.length + 1) {
+      ctx.pIdxForGenQueryDatas = 0;
+    }
+    const policyData = ctx.policyDatas[ctx.pIdxForGenQueryDatas];
+    ctx.pIdxForGenQueryDatas += 1;
+
+    // 请求地址
+    const url = `${ctx.host}/v1.0/policies/${policyData.policyNo}`;
+
+    // 请求体
+    const bodyStr = '';
+
+    // 获取鉴权字符串
+    const authStr = getAuthStr(ctx, url, bodyStr);
+
+    queryDatas.push([url, authStr]);
+  }
+
+  // 保存到文件
+  await saveToFile(queryDatas, path.resolve(ctx.outputDir, 'query.csv'));
+};
+
+/**
+ * 构造申请理赔数据
+ * @param {object} ctx 上下文变量
+ * @param {number} qty 数量
+ */
+const genClaimDatas = async (ctx, qty) => {
+  if (ctx.pIdxForGenClaimDatas === undefined) {
+    ctx.pIdxForGenClaimDatas = 0;
+  }
+
+  // 请求地址
+  const url = `${ctx.host}/v1.0/claims`;
+
+  // 构造数据
+  const claimDatas = [];
+  for (let i = 0; i < qty; i += 1) {
+    // 获取保单数据
+    if (ctx.pIdxForGenClaimDatas >= ctx.policyDatas.length + 1) {
+      throw new Error('没有足够的保单可以构造申请理赔数据');
+    }
+    const policyData = ctx.policyDatas[ctx.pIdxForGenClaimDatas];
+    ctx.pIdxForGenClaimDatas += 1;
+
+    // 请求体
+    const bodyStr = JSON.stringify({
+      policyNo: policyData.policyNo,
+      insureds: [
+        {
+          no: policyData.no,
+          relationship: policyData.relationship,
+          name: policyData.name,
+          idType: policyData.idType,
+          idNo: policyData.idNo,
+          gender: policyData.gender,
+          birth: policyData.birth,
+        },
+      ],
+    });
+
+    // 获取鉴权字符串
+    const authStr = getAuthStr(ctx, url, bodyStr);
+
+    claimDatas.push([bodyStr, authStr]);
+  }
+
+  // 保存到文件
+  await saveToFile(claimDatas, path.resolve(ctx.outputDir, 'claim.csv'));
+};
+
+/**
  * 执行数据构造
  */
 const gen = async () => {
   // 定义一个上下文变量
   const ctx = {};
 
-  // 生成配置信息
-  await genConfig(ctx);
+  // 初始化
+  await init(ctx);
 
   // 批量构造
-  for (let i = 0; i < ctx.total; i += 4) {
+  for (let i = 0; i < ctx.total; i += 1) {
     // 构造报价数据
     await genQuoteDatas(ctx, 2);
 
     // 构造承保数据
     await genAcceptDatas(ctx, 4);
 
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-
     // 构造查询保单数据
+    await genQueryDatas(ctx, 2);
+
     // 构造申请理赔数据
+    await genClaimDatas(ctx, 1);
   }
 };
 
