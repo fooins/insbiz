@@ -26,9 +26,9 @@ const { getRandomNum, md5 } = require('../../../../src/libraries/utils');
  */
 const initConfig = (ctx) => {
   // 线程数
-  const numberOfThreads = 1;
+  const numberOfThreads = 3;
   // 循环次数
-  const loopCount = 1;
+  const loopCount = 5;
   // 总任务数
   ctx.total = numberOfThreads * loopCount;
 
@@ -281,14 +281,15 @@ const genQueryDatas = async (ctx, qty) => {
   const queryDatas = [];
   for (let i = 0; i < qty; i += 1) {
     // 获取保单数据
-    if (ctx.pIdxForGenQueryDatas >= ctx.policyDatas.length + 1) {
+    if (ctx.pIdxForGenQueryDatas >= ctx.policyDatas.length - 1) {
       ctx.pIdxForGenQueryDatas = 0;
     }
     const policyData = ctx.policyDatas[ctx.pIdxForGenQueryDatas];
     ctx.pIdxForGenQueryDatas += 1;
 
     // 请求地址
-    const url = `${ctx.host}/v1.0/policies/${policyData.policyNo}`;
+    const queryPath = `/v1.0/policies/${policyData.policyNo}`;
+    const url = `${ctx.host}${queryPath}`;
 
     // 请求体
     const bodyStr = '';
@@ -296,7 +297,7 @@ const genQueryDatas = async (ctx, qty) => {
     // 获取鉴权字符串
     const authStr = getAuthStr(ctx, url, bodyStr);
 
-    queryDatas.push([url, authStr]);
+    queryDatas.push([queryPath, authStr]);
   }
 
   // 保存到文件
@@ -320,7 +321,7 @@ const genClaimDatas = async (ctx, qty) => {
   const claimDatas = [];
   for (let i = 0; i < qty; i += 1) {
     // 获取保单数据
-    if (ctx.pIdxForGenClaimDatas >= ctx.policyDatas.length + 1) {
+    if (ctx.pIdxForGenClaimDatas > ctx.policyDatas.length - 1) {
       throw new Error('没有足够的保单可以构造申请理赔数据');
     }
     const policyData = ctx.policyDatas[ctx.pIdxForGenClaimDatas];
