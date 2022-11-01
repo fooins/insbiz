@@ -114,7 +114,8 @@ const validation = async (ctx, reqData) => {
         (idNo && idNo !== ins.idNo) ||
         (gender && gender !== ins.gender) ||
         (birth &&
-          moment(birth).toISOString() !== moment(ins.birth).toISOString())
+          moment(birth).format('YYYYMMDD') !==
+            moment(ins.birth).format('YYYYMMDD'))
       ) {
         return false;
       }
