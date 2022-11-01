@@ -45,6 +45,11 @@ module.exports = function getClaimModel() {
       },
     },
     {
+      indexes: [
+        {
+          fields: ['policyId'],
+        },
+      ],
       comment: '理赔单表',
     },
   );
