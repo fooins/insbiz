@@ -102,7 +102,7 @@ const validation = async (ctx, reqData) => {
   // 检查被保险人
   const noSet = new Set();
   ctx.reqDataValidated.insureds.forEach((insured, idx) => {
-    const { no, relationship, name, idType, idNo, gender, birth } = insured;
+    const { no, relationship, name, idType, idNo, gender } = insured;
 
     // 匹配被保险人
     const oriInsured = policy.insureds.find((ins) => {
@@ -112,10 +112,7 @@ const validation = async (ctx, reqData) => {
         (name && name !== ins.name) ||
         (idType && idType !== ins.idType) ||
         (idNo && idNo !== ins.idNo) ||
-        (gender && gender !== ins.gender) ||
-        (birth &&
-          moment(birth).format('YYYYMMDD') !==
-            moment(ins.birth).format('YYYYMMDD'))
+        (gender && gender !== ins.gender)
       ) {
         return false;
       }
