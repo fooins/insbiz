@@ -41,9 +41,9 @@ const initConfig = (ctx) => {
   ctx.host = 'http://124.222.120.210';
 
   // 文件输出目录
-  ctx.outputDir = 'C:/Users/Max Fang/Desktop/';
+  ctx.outputDir = '';
   // 保单数据文件
-  ctx.policyDataFile = 'C:/Users/Max Fang/Desktop/policy-datas.csv';
+  ctx.policyDataFile = '';
 };
 
 /**
