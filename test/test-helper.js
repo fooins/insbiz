@@ -574,7 +574,7 @@ const getRandomIdNum = () => {
   const address = addresses[getRandomNum(0, addresses.length - 1)];
 
   // 7到14位是出生年月日，采用YYYYMMDD格式；
-  const year = getRandomNum(1970, 2004);
+  const year = getRandomNum(1970, 2003);
   const month = `${getRandomNum(1, 12)}`.padStart(2, '0');
   const day = `${getRandomNum(1, 28)}`.padStart(2, '0');
   const birthday = `${year}${month}${day}`;
@@ -620,7 +620,7 @@ const getRandomIdNum = () => {
  * @returns {object}
  */
 const getRandomId = () => {
-  const idType = ['passport', 'idcard'][getRandomNum(0, 1)];
+  const idType = ['passport', 'idcard'][getRandomNum(0, 1)] || 'passport';
 
   let idNo = '';
   if (idType === 'idcard') {
