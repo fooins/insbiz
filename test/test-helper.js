@@ -646,7 +646,7 @@ const getRandomGender = () => {
  * @returns {string}
  */
 const getRandomBirth = () => {
-  const year = getRandomNum(1970, 2004);
+  const year = getRandomNum(1970, 2003);
   const month = `${getRandomNum(1, 12)}`.padStart(2, '0');
   const day = `${getRandomNum(1, 28)}`.padStart(2, '0');
   return moment(`${year}-${month}-${day}`).toISOString(true);
