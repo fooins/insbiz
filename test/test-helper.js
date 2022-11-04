@@ -1,4 +1,5 @@
 const moment = require('moment');
+const CryptoJS = require('crypto-js');
 const { getRandomNum } = require('../src/libraries/utils');
 
 /**
@@ -699,6 +700,56 @@ const getRandomRelationship = () => {
   return arr[getRandomNum(0, arr.length - 1)];
 };
 
+/**
+ * 获取查询参数字符串
+ * @param {object} query 查询参数对象
+ * @returns {string} 查询参数字符串
+ */
+const getQueryStr = (query) => {
+  const keys = Object.keys(query);
+  keys.sort();
+
+  const pairs = [];
+  keys.forEach((key) => {
+    pairs.push(`${key}=${query[key]}`);
+  });
+
+  return pairs.join('&');
+};
+
+/**
+ * 获取鉴权字符串
+ * @param {string} url 请求地址
+ * @param {string} rawBody 请求体
+ * @param {string} secretId 密钥ID
+ * @param {string} secretKey 密钥
+ * @returns {string}
+ */
+const getAuthorization = (url, rawBody, secretId, secretKey) => {
+  // 解析URL
+  const urlParsed = new URL(url);
+
+  // 查询参数字符串
+  const query = {};
+  urlParsed.searchParams.forEach((val, key) => {
+    query[key] = val;
+  });
+  const queryStr = getQueryStr(query);
+
+  // 当前时间戳（秒级）
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  // 签名
+  const signature = CryptoJS.enc.Base64.stringify(
+    CryptoJS.HmacSHA1(
+      `${secretId}${timestamp}${urlParsed.pathname}${queryStr}${rawBody}`,
+      secretKey,
+    ),
+  );
+
+  return `SecretId=${secretId}, Timestamp=${timestamp}, Signature=${signature}`;
+};
+
 module.exports = {
   getRandomPeriod,
   getRandomName,
@@ -707,4 +758,5 @@ module.exports = {
   getRandomBirth,
   getRandomContactNo,
   getRandomRelationship,
+  getAuthorization,
 };
