@@ -577,9 +577,8 @@ const charging = async (ctx) => {
 
 /**
  * 生成保单号
- * @param {object} ctx 上下文对象
  */
-const generatePolicyNo = async (ctx) => {
+const genPolicyNo = async () => {
   // 获取自增序号
   const incr = await getRedis().incr('policy-no-incr');
 
@@ -588,7 +587,15 @@ const generatePolicyNo = async (ctx) => {
   const incrStr = `${incr}`.padStart(8, '0');
   const policyNo = `FOOINS${date}${incrStr}`;
 
-  ctx.policyData.policyNo = policyNo;
+  return policyNo;
+};
+
+/**
+ * 承保
+ * @param {object} ctx 上下文对象
+ */
+const accept = async (ctx) => {
+  ctx.policyData.policyNo = await genPolicyNo();
   ctx.policyData.boundTime = moment().toISOString(true);
 };
 
@@ -686,8 +693,8 @@ const acceptInsurance = async (reqData, profile) => {
     // 计费
     await charging(ctx);
 
-    // 生成保单号
-    await generatePolicyNo(ctx);
+    // 承保
+    await accept(ctx);
 
     // 保存数据
     await savePolicyData(ctx);
@@ -718,4 +725,5 @@ module.exports = {
   basalValidation,
   bizValidation,
   charging,
+  genPolicyNo,
 };

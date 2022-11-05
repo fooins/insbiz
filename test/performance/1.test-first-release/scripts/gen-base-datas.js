@@ -8,6 +8,9 @@ const { getBizConfig } = require('../../../../src/libraries/biz-config');
 const { getRandomNum } = require('../../../../src/libraries/utils');
 const { aesEncrypt } = require('../../../../src/libraries/crypto');
 const {
+  genPolicyNo,
+} = require('../../../../src/components/policies/services/accept');
+const {
   getRandomPeriod,
   getRandomName,
   getRandomId,
@@ -163,20 +166,14 @@ const genQtyConfig = async (ctx) => {
 const genPolicyDatas = async (ctx) => {
   const policyDatas = [];
   for (let i = 0; i < ctx.bulkSize; i += 1) {
-    // 生成保单号
-    const incr = await getRedis().incr('policy-no-incr');
-    const date = moment().format('YYYYMMDD');
-    const incrStr = `${incr}`.padStart(8, '0');
-    const policyNo = `FOOINS${date}${incrStr}`;
-
     // 获取随机的保障期间
     const { effectiveTime, expiryTime } = getRandomPeriod();
 
     policyDatas.push({
-      policyNo,
       effectiveTime,
       expiryTime,
       orderNo: uuid.v4(),
+      policyNo: await genPolicyNo(),
       producerId: ctx.producer.id,
       contractId: ctx.contract.id,
       contractVersion: ctx.contract.version,
