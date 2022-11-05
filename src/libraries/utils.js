@@ -190,6 +190,93 @@ const getRandomNum = (min, max) =>
  */
 const md5 = (data) => crypto.createHash('md5').update(data).digest('hex');
 
+/**
+ * 获取指定长度的随机字符
+ * @param {number} length 长度
+ * @returns {string}
+ */
+function getRandomChars(length) {
+  const seed = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+    'a',
+    'b',
+    'c',
+    'd',
+    'e',
+    'f',
+    'g',
+    'h',
+    'i',
+    'j',
+    'k',
+    'l',
+    'm',
+    'n',
+    'o',
+    'p',
+    'q',
+    'r',
+    's',
+    't',
+    'u',
+    'v',
+    'w',
+    'x',
+    'y',
+    'z',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '0',
+    '!',
+    '@',
+    '#',
+    '$',
+    '%',
+    '^',
+    '&',
+    '*',
+  ];
+
+  let key = '';
+  for (let i = 0; i < length; i += 1) {
+    key += seed[getRandomNum(0, seed.length)];
+  }
+
+  return key;
+}
+
 module.exports = {
   error400,
   error403,
@@ -200,5 +287,6 @@ module.exports = {
   parseIdCard,
   sleep,
   getRandomNum,
+  getRandomChars,
   md5,
 };
