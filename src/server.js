@@ -20,7 +20,8 @@ let httpServer;
 const startHttpServer = async (options = {}) =>
   new Promise((resolve) => {
     // 定义端口和主机名
-    const port = options.port || config.get('server.port');
+    const port =
+      options.port === undefined ? config.get('server.port') : options.port;
     const hostname = options.hostname || config.get('server.host');
 
     // 监听错误事件

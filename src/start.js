@@ -30,12 +30,19 @@ const logger = require('./libraries/logger')('start', {
     await getDbConnection().authenticate();
     logger.info('数据库连接成功');
 
-    await new Promise((resolve) => {
-      getRedis().on('connect', () => {
-        logger.info('Redis连接成功');
-        resolve();
-      });
-    });
+    await Promise.race([
+      new Promise((resolve) => {
+        getRedis().on('connect', () => {
+          logger.info('Redis连接成功');
+          resolve();
+        });
+      }),
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error('Redis连接超时'));
+        }, 3000);
+      }),
+    ]);
 
     const addressInfo = await startHttpServer();
     logger.info('HTTP服务启动成功', { addressInfo });
