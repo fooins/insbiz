@@ -7,7 +7,7 @@
     "start:dev": "cross-env NODE_ENV=development nodemon ./src/start.js",
     "start": "NODE_ENV=production pm2 --name insbiz start ./src/start.js",
     "lint": "eslint . --fix",
-    "test": "cross-env NODE_ENV=development jest",
+    "test": "cross-env NODE_ENV=development jest --detectOpenHandles",
     "sync-models:dev": "cross-env NODE_ENV=development node ./src/scripts/sync-models.js",
     "reset-data:dev": "cross-env NODE_ENV=development node ./src/scripts/reset-data.js"
   },
