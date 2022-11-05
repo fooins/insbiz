@@ -3,13 +3,15 @@
 
 const uuid = require('uuid');
 const moment = require('moment');
-const { getRedis } = require('../../../../src/libraries/redis');
 const { getBizConfig } = require('../../../../src/libraries/biz-config');
 const { getRandomNum } = require('../../../../src/libraries/utils');
 const { aesEncrypt } = require('../../../../src/libraries/crypto');
 const {
   genPolicyNo,
 } = require('../../../../src/components/policies/services/accept');
+const {
+  genClaimNo,
+} = require('../../../../src/components/claims/services/apply');
 const {
   getRandomPeriod,
   getRandomName,
@@ -271,14 +273,8 @@ const genClaimDatas = async (ctx, policies) => {
     const policy = policies[i];
 
     if (getRandomNum(0, 1) === 1) {
-      // 生成理赔单号
-      const incr = await getRedis().incr('claim-no-incr');
-      const date = moment().format('YYYYMMDD');
-      const incrStr = `${incr}`.padStart(6, '0');
-      const claimNo = `CLAIMS${date}${incrStr}`;
-
       claimDatas.push({
-        claimNo,
+        claimNo: await genClaimNo(),
         policyId: policy.id,
         producerId: ctx.producer.id,
         sumInsured: getRandomNum(1000, 10000),
