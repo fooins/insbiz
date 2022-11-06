@@ -13,7 +13,6 @@
 ```
 ├─ config  // 配置文件目录
 ├─ releases  // 发布信息目录
-├─ test  // 测试相关目录
 │
 ├─ src  // 源代码目录
 │  ├─ components  // 业务组件目录
@@ -27,6 +26,10 @@
 │  ├─ scheduler.js  // 作业调度器
 │  ├─ server.js  // HTTP 服务实现
 │  └─ start.js  // 程序启动入口
+│
+├─ test  // 测试相关目录
+│  ├─ api  // 接口测试目录
+│  └─ performance  // 性能测试目录
 │
 └─ REST-API-reference-latest.md  // REST API 参考文档
 ```
