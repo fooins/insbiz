@@ -79,6 +79,7 @@ const notify = async (task) => {
       url: producer.notifyUrl,
       method: 'POST',
       headers: {
+        'content-type': 'application/json',
         Authorization: `SecretId=${secret.secretId}, Timestamp=${timestamp}, Signature=${signature}`,
       },
       data: rawBody,
