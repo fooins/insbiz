@@ -4,7 +4,7 @@
 const uuid = require('uuid');
 const moment = require('moment');
 const { getBizConfig } = require('../../../../src/libraries/biz-config');
-const { getRandomNum } = require('../../../../src/libraries/utils');
+const { getRandomNum, md5 } = require('../../../../src/libraries/utils');
 const { aesEncrypt } = require('../../../../src/libraries/crypto');
 const {
   genPolicyNo,
@@ -174,7 +174,7 @@ const genPolicyDatas = async (ctx) => {
     policyDatas.push({
       effectiveTime,
       expiryTime,
-      orderNo: uuid.v4(),
+      orderNo: md5(uuid.v4()),
       policyNo: await genPolicyNo(),
       producerId: ctx.producer.id,
       contractId: ctx.contract.id,

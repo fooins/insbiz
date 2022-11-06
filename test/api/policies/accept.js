@@ -1,6 +1,8 @@
 const uuid = require('uuid');
+const moment = require('moment');
 const axios = require('axios');
 const config = require('config');
+const { Op } = require('sequelize');
 const {
   beforeAll,
   afterAll,
@@ -11,6 +13,11 @@ const {
 } = require('@jest/globals');
 const { getDbConnection } = require('../../../src/libraries/data-access');
 const { aesEncrypt } = require('../../../src/libraries/crypto');
+const { getBizConfig } = require('../../../src/libraries/biz-config');
+const { getRedis } = require('../../../src/libraries/redis');
+const {
+  genPolicyNo,
+} = require('../../../src/components/policies/services/accept');
 const {
   getRandomChars,
   md5,
@@ -23,6 +30,8 @@ const {
   getContractModel,
   getSecretModel,
   getPolicyModel,
+  getApplicantModel,
+  getInsuredModel,
 } = require('../../../src/models');
 const {
   getAuthorization,
@@ -96,6 +105,14 @@ const genDependencies = async () => {
   ctx.contract = await getContractModel().findOne({
     where: { code: contractCode },
   });
+
+  // 获取业务规则配置
+  ctx.bizConfig = await getBizConfig({
+    product: ctx.product,
+    plan: ctx.plan,
+    producer: ctx.producer,
+    contract: ctx.contract,
+  });
 };
 
 /**
@@ -122,12 +139,41 @@ const clearnDependencies = async () => {
  * 清除产生的测试数据
  */
 const clearnTestDatas = async () => {
-  // 删除保单
-  await getPolicyModel().destroy({
+  // 查询需要删除的保单
+  const policies = await getPolicyModel().findAll({
+    attributes: ['id'],
     where: {
       contractId: ctx.contract.id,
       contractVersion: ctx.contract.version,
       planId: ctx.plan.id,
+    },
+  });
+  const policyIds = policies.map((p) => p.id);
+
+  // 删除保单
+  await getPolicyModel().destroy({
+    where: {
+      id: {
+        [Op.in]: policyIds,
+      },
+    },
+  });
+
+  // 删除投保人
+  await getApplicantModel().destroy({
+    where: {
+      policyId: {
+        [Op.in]: policyIds,
+      },
+    },
+  });
+
+  // 删除被保险人
+  await getInsuredModel().destroy({
+    where: {
+      policyId: {
+        [Op.in]: policyIds,
+      },
     },
   });
 };
@@ -161,6 +207,9 @@ afterAll(async () => {
 
   // 关闭数据库连接
   await getDbConnection().close();
+
+  // 断开Redis连接
+  await getRedis().end();
 });
 
 // 测试逻辑
@@ -238,6 +287,152 @@ describe('承保接口', () => {
     expect(rst).toMatchObject({
       status: 201,
       data: { policyNo: expect.stringMatching(/^FOOINS[0-9a-zA-Z]*$/) },
+    });
+  });
+
+  test('当幂等投保时，应得到幂等结果', async () => {
+    // 1. 配置
+    let policy = null;
+    let applicant = null;
+    let insured = null;
+    let bodyStr = '';
+    let authStr = '';
+    {
+      // 获取随机的保障期间
+      const { effectiveTime, expiryTime } = getRandomPeriod();
+      // 生成随机证件信息
+      const { idType, idNo } = getRandomId();
+      // 获取随机联系号码
+      const contactNo = getRandomContactNo();
+
+      // 构造保单
+      policy = await getPolicyModel().create({
+        effectiveTime,
+        expiryTime,
+        orderNo: md5(uuid.v4()),
+        policyNo: await genPolicyNo(),
+        producerId: ctx.producer.id,
+        contractId: ctx.contract.id,
+        contractVersion: ctx.contract.version,
+        productId: ctx.product.id,
+        productVersion: ctx.product.version,
+        planId: ctx.plan.id,
+        bizConfig: JSON.stringify(ctx.bizConfig),
+        boundTime: moment().toISOString(true),
+        premium: getRandomNum(1, 1000),
+        status: 'valid',
+        extensions: JSON.stringify({}),
+      });
+      // 构造投保人
+      applicant = await getApplicantModel().create({
+        idType,
+        idNo,
+        contactNo,
+        no: uuid.v4(),
+        policyId: policy.id,
+        name: getRandomName(),
+        gender: getRandomGender(),
+        birth: getRandomBirth(),
+        email: `${contactNo}@qq.com`,
+      });
+      // 构造被保险人
+      insured = await getInsuredModel().create({
+        idType,
+        idNo,
+        contactNo,
+        no: uuid.v4(),
+        relationship: 'self',
+        policyId: policy.id,
+        name: applicant.name,
+        gender: applicant.gender,
+        birth: applicant.birth,
+        email: applicant.email,
+        premium: getRandomNum(1, 1000),
+      });
+
+      // 请求体
+      bodyStr = JSON.stringify({
+        effectiveTime: policy.effectiveTime,
+        expiryTime: policy.expiryTime,
+        orderNo: policy.orderNo,
+        contractCode: ctx.contract.code,
+        contractVersion: `${policy.contractVersion}`,
+        planCode: ctx.plan.code,
+        premium: policy.premium,
+        extensions: {},
+        applicants: [
+          {
+            idType: applicant.idType,
+            idNo: applicant.idNo,
+            contactNo: applicant.contactNo,
+            name: applicant.name,
+            gender: applicant.gender,
+            birth: applicant.birth,
+            email: applicant.email,
+          },
+        ],
+        insureds: [
+          {
+            relationship: insured.relationship,
+            name: insured.name,
+            idType: insured.idType,
+            idNo: insured.idNo,
+            gender: insured.gender,
+            birth: insured.birth,
+            contactNo: insured.contactNo,
+            email: insured.email,
+            premium: insured.premium,
+          },
+        ],
+      });
+      // 鉴权信息
+      authStr = getAuthorization(ctx.url, bodyStr, ctx.secretId, ctx.secretKey);
+    }
+
+    // 2. 执行
+    const rst = await ctx.axiosClient.request({
+      data: bodyStr,
+      headers: { authorization: authStr },
+    });
+
+    // 3. 断言
+    expect(rst).toMatchObject({
+      status: 200,
+      data: {
+        orderNo: policy.orderNo,
+        policyNo: policy.policyNo,
+        contractCode: ctx.contract.code,
+        contractVersion: `${ctx.contract.version}`,
+        productCode: ctx.product.code,
+        productVersion: `${ctx.product.version}`,
+        planCode: ctx.plan.code,
+        premium: policy.premium,
+        status: policy.status,
+        applicants: [
+          {
+            no: applicant.no,
+            name: applicant.name,
+            idType: applicant.idType,
+            idNo: applicant.idNo,
+            gender: applicant.gender,
+            contactNo: applicant.contactNo,
+            email: applicant.email,
+          },
+        ],
+        insureds: [
+          {
+            no: insured.no,
+            relationship: insured.relationship,
+            name: insured.name,
+            idType: insured.idType,
+            idNo: insured.idNo,
+            gender: insured.gender,
+            contactNo: insured.contactNo,
+            email: insured.email,
+            premium: insured.premium,
+          },
+        ],
+      },
     });
   });
 });
