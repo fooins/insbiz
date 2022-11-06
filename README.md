@@ -13,7 +13,6 @@
 ```
 ├─ config  // 配置文件目录
 ├─ releases  // 发布信息目录
-├─ test  // 测试相关目录
 │
 ├─ src  // 源代码目录
 │  ├─ components  // 业务组件目录
@@ -27,6 +26,10 @@
 │  ├─ scheduler.js  // 作业调度器
 │  ├─ server.js  // HTTP 服务实现
 │  └─ start.js  // 程序启动入口
+│
+├─ test  // 测试相关目录
+│  ├─ api  // 接口测试目录
+│  └─ performance  // 性能测试目录
 │
 └─ REST-API-reference-latest.md  // REST API 参考文档
 ```
@@ -54,5 +57,6 @@
 - `start:dev`：启动开发环境程序服务。主要用于本地开发调试，代码变更后会自动重启。
 - `start`：启动生产环境程序服务。使用 pm2 进行管理。
 - `lint`：执行 ESLint 检查并修复可自动修复的错误或警告。
+- `test`：执行接口测试。需要先单独启动 HTTP 服务。
 - `sync-models:dev`：将所有模型同步到开发环境数据库，已经存在的表会自动根据模型调整为最新的结构。
 - `reset-data:dev`：在开发环境数据库中添加样本数据，在此之前会先清空数据并同步所有模型。

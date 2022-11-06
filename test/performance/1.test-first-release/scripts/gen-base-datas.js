@@ -3,10 +3,15 @@
 
 const uuid = require('uuid');
 const moment = require('moment');
-const { getRedis } = require('../../../../src/libraries/redis');
 const { getBizConfig } = require('../../../../src/libraries/biz-config');
-const { getRandomNum } = require('../../../../src/libraries/utils');
+const { getRandomNum, md5 } = require('../../../../src/libraries/utils');
 const { aesEncrypt } = require('../../../../src/libraries/crypto');
+const {
+  genPolicyNo,
+} = require('../../../../src/components/policies/services/accept');
+const {
+  genClaimNo,
+} = require('../../../../src/components/claims/services/apply');
 const {
   getRandomPeriod,
   getRandomName,
@@ -163,20 +168,14 @@ const genQtyConfig = async (ctx) => {
 const genPolicyDatas = async (ctx) => {
   const policyDatas = [];
   for (let i = 0; i < ctx.bulkSize; i += 1) {
-    // 生成保单号
-    const incr = await getRedis().incr('policy-no-incr');
-    const date = moment().format('YYYYMMDD');
-    const incrStr = `${incr}`.padStart(8, '0');
-    const policyNo = `FOOINS${date}${incrStr}`;
-
     // 获取随机的保障期间
     const { effectiveTime, expiryTime } = getRandomPeriod();
 
     policyDatas.push({
-      policyNo,
       effectiveTime,
       expiryTime,
-      orderNo: uuid.v4(),
+      orderNo: md5(uuid.v4()),
+      policyNo: await genPolicyNo(),
       producerId: ctx.producer.id,
       contractId: ctx.contract.id,
       contractVersion: ctx.contract.version,
@@ -274,14 +273,8 @@ const genClaimDatas = async (ctx, policies) => {
     const policy = policies[i];
 
     if (getRandomNum(0, 1) === 1) {
-      // 生成理赔单号
-      const incr = await getRedis().incr('claim-no-incr');
-      const date = moment().format('YYYYMMDD');
-      const incrStr = `${incr}`.padStart(6, '0');
-      const claimNo = `CLAIMS${date}${incrStr}`;
-
       claimDatas.push({
-        claimNo,
+        claimNo: await genClaimNo(),
         policyId: policy.id,
         producerId: ctx.producer.id,
         sumInsured: getRandomNum(1000, 10000),

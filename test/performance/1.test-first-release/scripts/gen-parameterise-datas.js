@@ -6,7 +6,6 @@ const os = require('os');
 const Joi = require('joi');
 const path = require('path');
 const uuid = require('uuid');
-const CryptoJS = require('crypto-js');
 // eslint-disable-next-line import/no-unresolved
 const { parse: csvParse } = require('csv-parse/sync');
 const {
@@ -17,6 +16,7 @@ const {
   getRandomBirth,
   getRandomContactNo,
   getRandomRelationship,
+  getAuthorization,
 } = require('../../../test-helper');
 const { getRandomNum, md5 } = require('../../../../src/libraries/utils');
 
@@ -79,55 +79,6 @@ const init = async (ctx) => {
   if (ctx.policyDatas.length < ctx.total) {
     throw new Error(`保单数据数量不够 ${ctx.total} 条`);
   }
-};
-
-/**
- * 获取查询参数字符串
- * @param {object} query 查询参数对象
- * @returns {string} 查询参数字符串
- */
-const getQueryStr = (query) => {
-  const keys = Object.keys(query);
-  keys.sort();
-
-  const pairs = [];
-  keys.forEach((key) => {
-    pairs.push(`${key}=${query[key]}`);
-  });
-
-  return pairs.join('&');
-};
-
-/**
- * 获取鉴权字符串
- * @param {object} ctx 上下文变量
- * @param {string} url 请求地址
- * @param {string} bodyStr 请求体
- * @returns {string}
- */
-const getAuthStr = (ctx, url, bodyStr) => {
-  // 解析URL
-  const urlParsed = new URL(url);
-
-  // 查询参数字符串
-  const query = {};
-  urlParsed.searchParams.forEach((val, key) => {
-    query[key] = val;
-  });
-  const queryStr = getQueryStr(query);
-
-  // 当前时间戳（秒级）
-  const timestamp = Math.floor(Date.now() / 1000);
-
-  // 签名
-  const signature = CryptoJS.enc.Base64.stringify(
-    CryptoJS.HmacSHA1(
-      `${ctx.secretId}${timestamp}${urlParsed.pathname}${queryStr}${bodyStr}`,
-      ctx.secretKey,
-    ),
-  );
-
-  return `SecretId=${ctx.secretId}, Timestamp=${timestamp}, Signature=${signature}`;
 };
 
 /**
@@ -233,7 +184,7 @@ const genQuoteDatas = async (ctx, qty) => {
     const bodyStr = JSON.stringify(genAcceptBody());
 
     // 获取鉴权字符串
-    const authStr = getAuthStr(ctx, url, bodyStr);
+    const authStr = getAuthorization(url, bodyStr, ctx.secretId, ctx.secretKey);
 
     quoteDatas.push([bodyStr, authStr]);
   }
@@ -258,7 +209,7 @@ const genAcceptDatas = async (ctx, qty) => {
     const bodyStr = JSON.stringify(genAcceptBody());
 
     // 获取鉴权字符串
-    const authStr = getAuthStr(ctx, url, bodyStr);
+    const authStr = getAuthorization(url, bodyStr, ctx.secretId, ctx.secretKey);
 
     acceptDatas.push([bodyStr, authStr]);
   }
@@ -295,7 +246,7 @@ const genQueryDatas = async (ctx, qty) => {
     const bodyStr = '';
 
     // 获取鉴权字符串
-    const authStr = getAuthStr(ctx, url, bodyStr);
+    const authStr = getAuthorization(url, bodyStr, ctx.secretId, ctx.secretKey);
 
     queryDatas.push([queryPath, authStr]);
   }
@@ -344,7 +295,7 @@ const genClaimDatas = async (ctx, qty) => {
     });
 
     // 获取鉴权字符串
-    const authStr = getAuthStr(ctx, url, bodyStr);
+    const authStr = getAuthorization(url, bodyStr, ctx.secretId, ctx.secretKey);
 
     claimDatas.push([bodyStr, authStr]);
   }

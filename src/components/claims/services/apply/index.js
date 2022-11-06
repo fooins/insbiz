@@ -130,6 +130,22 @@ const validation = async (ctx, reqData) => {
 };
 
 /**
+ * 生成理赔单号
+ * @returns {string}
+ */
+const genClaimNo = async () => {
+  // 获取自增序号
+  const incr = await getRedis().incr('claim-no-incr');
+
+  // 生成理赔单号
+  const date = moment().format('YYYYMMDD');
+  const incrStr = `${incr}`.padStart(6, '0');
+  const claimNo = `CLAIMS${date}${incrStr}`;
+
+  return claimNo;
+};
+
+/**
  * 生成理赔单数据
  * @param {object} ctx 上下文对象
  * @param {object} profile 身份数据
@@ -143,6 +159,7 @@ const generateClaimData = async (ctx, profile) => {
   const claimData = {
     policyId: policy.id,
     producerId: producer.id,
+    claimNo: await genClaimNo(),
     bizConfig: JSON.stringify(claim),
     insureds: reqDataValidated.insureds.map((ins) => ({
       no: ins.no,
@@ -158,22 +175,6 @@ const generateClaimData = async (ctx, profile) => {
 
   ctx.claimData = claimData;
   ctx.compensationTaskData = compensationTaskData;
-};
-
-/**
- * 生成理赔单号
- * @param {object} ctx 上下文对象
- */
-const generateClaimNo = async (ctx) => {
-  // 获取自增序号
-  const incr = await getRedis().incr('claim-no-incr');
-
-  // 生成理赔单号
-  const date = moment().format('YYYYMMDD');
-  const incrStr = `${incr}`.padStart(6, '0');
-  const claimNo = `CLAIMS${date}${incrStr}`;
-
-  ctx.claimData.claimNo = claimNo;
 };
 
 /**
@@ -242,9 +243,6 @@ const applyClaims = async (reqData, profile) => {
   // 生成理赔单数据
   await generateClaimData(ctx, profile);
 
-  // 生成理赔单号
-  await generateClaimNo(ctx);
-
   // 保存数据
   await saveClaimData(ctx);
 
@@ -256,4 +254,5 @@ const applyClaims = async (reqData, profile) => {
 
 module.exports = {
   applyClaims,
+  genClaimNo,
 };
