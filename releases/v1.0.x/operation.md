@@ -19,9 +19,9 @@
 
 4. 数据操作
 
-   - 创建数据库：`NODE_ENV=production node ./releases/v1.0.x/create-db.js`。
-   - 创建表：`NODE_ENV=production node ./releases/v1.0.x/create-tables.js`。
-   - 初始化数据：`NODE_ENV=production node ./releases/v1.0.x/init-datas.js`。
+   - 创建数据库：`NODE_ENV=production node ./releases/v1.0.0/create-db.js`。
+   - 创建表：`NODE_ENV=production node ./releases/v1.0.0/create-tables.js`。
+   - 初始化数据：`NODE_ENV=production node ./releases/v1.0.0/init-datas.js`。
 
 5. 回滚（若需要）
 
